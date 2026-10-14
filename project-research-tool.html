@@ -1189,7 +1189,12 @@
       <!-- ① 文化资源量化台账 -->
       <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:12px;">文化资源家底（量化台账）</div>
       <div id="cultureStatsGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:6px;"></div>
-      <div style="font-size:11px;color:var(--text-light);margin-bottom:20px;padding:0 2px;">数据来源：全国文物普查数据库 / 文化和旅游部非遗名录 / A级景区管理系统</div>
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:20px;padding:0 2px;line-height:1.8;">
+        数据来源：<a href="https://www.sach.gov.cn/col/col709/index.html" target="_blank" style="color:#2563eb;">国家文物局·全国文物普查</a> /
+        <a href="https://www.ihchina.cn/" target="_blank" style="color:#2563eb;">中国非遗网</a> /
+        <a href="https://www.mct.gov.cn/zwgk/tzgg/" target="_blank" style="color:#2563eb;">文旅部·A级景区公告</a> ·
+        <span style="color:#94a3b8;">地方志查本地政府官网「地方志办公室」，省年鉴查省统计局，数据空缺请实地调研</span>
+      </div>
 
       <!-- ② 文化产业GDP趋势 -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
@@ -1530,12 +1535,12 @@ const DEFAULT_DATA = {
     gdpLabels: ['2020','2021','2022','2023','2024'],
     tourist: { total: '—', perPerson: '—', avgStay: '—', seasonHigh: '—', seasonLow: '—', ratio: '—' },
     assets: [
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
-      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '文保单位（国保/省保/县保）', desc: '地方志办或文旅局可查，重点看数量级和历史沿革', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '非物质文化遗产', desc: '国家级非遗查中国非遗网，省级查省文旅厅公告', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: 'A级景区', desc: '文旅部官网可查A级景区名录，注意景区评定年份和现状', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '历史文化街区/名镇/名村', desc: '住建部/国家文物局联合认定，查政府公告', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '工业遗产/农业遗产', desc: '工信部/农业农村部有专项认定，可作为差异化IP', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '在地生活方式/独特习俗', desc: '通过田野调查/口述史采集，最难被复制', level: '待核实', color: '#94a3b8', ipPotential: 0 },
     ],
     ipMatrix: [
       { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
@@ -1543,11 +1548,11 @@ const DEFAULT_DATA = {
       { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
       { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
     ],
-    insight: '请通过以下渠道补充数据：地方志（县志/市志）、文旅局官网、省统计年鉴、全国文物普查数据库、非遗名录官网。',
+    insight: '请通过以下渠道补充数据：\n① 国家文物局全国普查（https://www.sach.gov.cn/col/col709/）查国保/省保单位数量；\n② 中国非遗网（https://www.ihchina.cn/）检索国家级非遗项目；\n③ 地方志办公室/省统计局官网查文化GDP及统计年鉴；\n④ 文旅局官网查A级景区名录及更新公告；\n⑤ 实地调研：文化馆、博物馆、非遗传承人访谈。',
     gap: '请补充当地文化资产的商业化缺口分析。'
   },
   location: { rail: '待核实', airport: '待核实', highway: '待核实' },
-  locationInsight: '请通过高德/百度地图及12306核实交通可达性。',
+  locationInsight: '交通可达性核实方法：\n① 高德/百度地图：输入项目地，查「去这里」功能，切换驾车/公交/火车模式，核实最近高铁站/机场距离及时长；\n② 12306官网/App：查询「出发地→项目地级市」列车班次及耗时；\n③ 机场公众号：核实项目地级市机场的航线覆盖（重点北上广/省会/旅游热门城市）；\n④ 高速公路：核实项目地周边高速出入口及国家高速主干道连通情况。',
   strengths: ['城市基本面尚可，具备合作基础', '待补充项目具体优势'],
   risks: ['数据待实地核实', '平台公司偿债能力待评估', '具体竞争格局待分析'],
   coop: [
