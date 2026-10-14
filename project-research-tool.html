@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目研判报告工具</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3a6b;
+    --primary-light: #2563a8;
+    --accent: #e8912a;
+    --accent-light: #fbbf24;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1e2a3a;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+    --green: #059669;
+    --red: #dc2626;
+    --orange: #d97706;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── 头部 ─── */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 40px 20px 50px;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 14px;
+    opacity: 0.8;
+    font-weight: 300;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    margin-top: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* ─── 主容器 ─── */
+  .container {
+    max-width: 900px;
+    margin: -30px auto 60px;
+    padding: 0 16px;
+  }
+
+  /* ─── 输入卡片 ─── */
+  .input-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 4px 24px rgba(26,58,107,0.08);
+    margin-bottom: 24px;
+  }
+
+  .input-card h2 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-card h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .form-group input, .form-group select {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fafbfc;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--primary-light);
+    background: white;
+  }
+
+  .form-hint {
+    font-size: 11px;
+    color: var(--text-light);
+    padding-left: 4px;
+  }
+
+  .btn-analyze {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-analyze:hover { opacity: 0.92; }
+  .btn-analyze:active { transform: scale(0.99); }
+  .btn-analyze:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ─── 加载状态 ─── */
+  .loading-card {
+    display: none;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 60px 40px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(26,58,107,0.08);
+    margin-bottom: 24px;
+  }
+
+  .loading-card.active { display: block; }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary-light);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 15px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-light), var(--accent));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .loading-steps {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .step-chip {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--text-light);
+    transition: all 0.3s;
+  }
+
+  .step-chip.done {
+    background: #dcfce7;
+    color: var(--green);
+  }
+
+  .step-chip.active {
+    background: #dbeafe;
+    color: var(--primary-light);
+    font-weight: 500;
+  }
+
+  /* ─── 报告区 ─── */
+  #report {
+    display: none;
+  }
+
+  #report.active { display: block; }
+
+  /* 报告封面 */
+  .report-cover {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f2654 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 48px 48px 40px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-cover::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+
+  .report-cover .cover-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .report-cover h2 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .report-cover .city-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    opacity: 0.8;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .cover-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* 通用卡片 */
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 2px 12px rgba(26,58,107,0.06);
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .num {
+    background: var(--primary);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  /* 评分卡 */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .score-item {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 12px;
+    background: var(--bg);
+  }
+
+  .score-item .label {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .score-item .score {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .score-item .unit {
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  .score-bar-wrap {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .score-bar-item { }
+
+  .score-bar-item .bar-bg {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar-item .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .bar-high { background: var(--green); }
+  .bar-mid { background: var(--accent); }
+  .bar-low { background: var(--red); }
+
+  /* 综合评级 */
+  .overall-rating {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 20px;
+  }
+
+  .rating-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .rating-A { background: linear-gradient(135deg, #059669, #34d399); }
+  .rating-B { background: linear-gradient(135deg, #2563a8, #60a5fa); }
+  .rating-C { background: linear-gradient(135deg, #d97706, #fbbf24); }
+  .rating-D { background: linear-gradient(135deg, #dc2626, #f87171); }
+
+  .rating-detail h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .rating-detail p {
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  .rating-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .rating-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #dbeafe;
+    color: var(--primary-light);
+    font-weight: 500;
+  }
+
+  /* 政策表格 */
+  .policy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .policy-table th {
+    background: var(--bg);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-light);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .policy-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .policy-table tr:last-child td { border-bottom: none; }
+
+  .policy-table td:first-child {
+    font-weight: 500;
+    color: var(--primary);
+    white-space: nowrap;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .tag-green { background: #dcfce7; color: #15803d; }
+  .tag-blue { background: #dbeafe; color: #1d4ed8; }
+  .tag-orange { background: #fef3c7; color: #b45309; }
+  .tag-gray { background: #f1f5f9; color: #64748b; }
+
+  /* 图表区 */
+  .charts-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .charts-1col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 220px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* 文化资产 */
+  .culture-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .culture-card {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+  }
+
+  .culture-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .culture-card p {
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  /* 区位分析 */
+  .location-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .loc-item {
+    padding: 16px;
+    background: var(--bg);
+    border-radius: 10px;
+  }
+
+  .loc-item .loc-label {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .loc-item .loc-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .loc-item .loc-sub {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  /* 结论建议 */
+  .conclusion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .conclusion-item {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .conclusion-item.strength {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+  }
+
+  .conclusion-item.risk {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+
+  .conclusion-item h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .conclusion-item ul {
+    list-style: none;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .conclusion-item ul li::before {
+    content: '→ ';
+    color: var(--text-light);
+  }
+
+  .conclusion-item.strength h4 { color: #15803d; }
+  .conclusion-item.risk h4 { color: #dc2626; }
+
+  /* 合作建议 */
+  .coop-path {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .coop-path-item {
+    flex: 1;
+    min-width: 160px;
+    padding: 18px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .coop-path-item:hover, .coop-path-item.selected {
+    border-color: var(--primary-light);
+    background: #eff6ff;
+  }
+
+  .coop-path-item .path-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .coop-path-item h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .coop-path-item p {
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  .coop-path-item .path-score {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .score-high { background: #dcfce7; color: #15803d; }
+  .score-mid { background: #fef3c7; color: #b45309; }
+
+  /* 报告操作栏 */
+  .report-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .btn-secondary {
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    background: white;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--primary-light);
+    color: var(--primary-light);
+  }
+
+  /* 页脚 */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  /* 动画 */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card { animation: fadeInUp 0.5s ease both; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.2s; }
+  .card:nth-child(4) { animation-delay: 0.3s; }
+  .card:nth-child(5) { animation-delay: 0.4s; }
+  .card:nth-child(6) { animation-delay: 0.5s; }
+
+  /* 响应式 */
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: repeat(3, 1fr); }
+    .score-bar-wrap { grid-template-columns: repeat(3, 1fr); }
+    .charts-2col { grid-template-columns: 1fr; }
+    .culture-grid { grid-template-columns: 1fr; }
+    .location-grid { grid-template-columns: 1fr; }
+    .conclusion-grid { grid-template-columns: 1fr; }
+    .report-cover { padding: 32px 24px; }
+    .input-card { padding: 24px 20px; }
+    .card { padding: 20px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .header, .input-card, .loading-card, .report-actions { display: none; }
+    .container { max-width: 100%; margin: 0; padding: 0; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #e2e8f0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 头部 -->
+<div class="header">
+  <h1>项目研判报告工具</h1>
+  <p>全资产运营服务商 · 商务研判专用</p>
+  <span class="header-badge">棱镜 Lens · v1.0</span>
+</div>
+
+<!-- 主容器 -->
+<div class="container">
+
+  <!-- 输入区 -->
+  <div class="input-card" id="inputSection">
+    <h2>项目基本信息</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>城市 / 区县</label>
+        <input type="text" id="city" placeholder="如：景德镇市、黟县、安庆市迎江区" />
+      </div>
+      <div class="form-group">
+        <label>项目名称</label>
+        <input type="text" id="project" placeholder="如：陶溪川文创街区、祁门县文旅综合体" />
+      </div>
+      <div class="form-group">
+        <label>项目类型</label>
+        <select id="projType">
+          <option value="">请选择（可跳过）</option>
+          <option>文旅景区</option>
+          <option>城市更新 / 旧改</option>
+          <option>特色小镇 / 田园综合体</option>
+          <option>商业街区 / 非标商业</option>
+          <option>产业园区</option>
+          <option>乡村振兴</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>预计合作模式</label>
+        <select id="coopMode">
+          <option value="">请选择（可跳过）</option>
+          <option>策划 / 设计 / 建设 / 运营一体化</option>
+          <option>EPCO</option>
+          <option>运营委托</option>
+          <option>合资成立平台公司</option>
+          <option>待定</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>项目阶段</label>
+        <select id="projStage">
+          <option value="">请选择（可跳过）</option>
+          <option>线索阶段（刚接触）</option>
+          <option>意向阶段（有意向推进）</option>
+          <option>方案阶段（已出概念方案）</option>
+          <option>谈判阶段（商务条款洽谈中）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>项目规模（万亩 / 万㎡ / 亿元，可填范围）</label>
+        <input type="text" id="projScale" placeholder="如：占地约200亩，投资约3亿元" />
+      </div>
+    </div>
+    <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">
+      🔍 开始研判分析
+    </button>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading-card" id="loadingCard">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">正在抓取公开数据…</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="loading-steps">
+      <span class="step-chip" id="step1">政策数据</span>
+      <span class="step-chip" id="step2">经济人口</span>
+      <span class="step-chip" id="step3">交通区位</span>
+      <span class="step-chip" id="step4">在地文化</span>
+      <span class="step-chip" id="step5">综合研判</span>
+    </div>
+  </div>
+
+  <!-- 报告区 -->
+  <div id="report">
+
+    <div class="report-actions">
+      <button class="btn-secondary" onclick="window.print()">📄 导出 / 打印</button>
+      <button class="btn-secondary" onclick="resetForm()">🔄 新建研判</button>
+    </div>
+
+    <!-- 封面 -->
+    <div class="report-cover" id="reportCover">
+      <div class="cover-label">BUSINESS RESEARCH REPORT · 商务研判报告</div>
+      <h2 id="coverTitle">——</h2>
+      <div class="city-tag" id="coverCity">——</div>
+      <div class="cover-meta">
+        <span>📅 <span id="coverDate"></span></span>
+        <span>🏢 全资产运营服务商</span>
+        <span>🤖 棱镜 Lens 研判系统 v1.0</span>
+      </div>
+    </div>
+
+    <!-- 一、五维评分总览 -->
+    <div class="card">
+      <div class="card-title"><span class="num">1</span>五维评分总览</div>
+      <div class="score-grid">
+        <div class="score-item">
+          <div class="label">政策支持</div>
+          <div class="score" id="s-policy">—</div>
+          <div class="unit">分</div>
+        </div>
+        <div class="score-item">
+          <div class="label">经济实力</div>
+          <div class="score" id="s-economy">—</div>
+          <div class="unit">分</div>
+        </div>
+        <div class="score-item">
+          <div class="label">人口交通</div>
+          <div class="score" id="s-population">—</div>
+          <div class="unit">分</div>
+        </div>
+        <div class="score-item">
+          <div class="label">在地文化</div>
+          <div class="score" id="s-culture">—</div>
+          <div class="unit">分</div>
+        </div>
+        <div class="score-item">
+          <div class="label">区位条件</div>
+          <div class="score" id="s-location">—</div>
+          <div class="unit">分</div>
+        </div>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-item">
+          <div class="bar-bg"><div class="bar-fill bar-high" id="b-policy" style="width:0%"></div></div>
+        </div>
+        <div class="score-bar-item">
+          <div class="bar-bg"><div class="bar-fill bar-high" id="b-economy" style="width:0%"></div></div>
+        </div>
+        <div class="score-bar-item">
+          <div class="bar-bg"><div class="bar-fill bar-high" id="b-population" style="width:0%"></div></div>
+        </div>
+        <div class="score-bar-item">
+          <div class="bar-bg"><div class="bar-fill bar-high" id="b-culture" style="width:0%"></div></div>
+        </div>
+        <div class="score-bar-item">
+          <div class="bar-bg"><div class="bar-fill bar-high" id="b-location" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="overall-rating">
+        <div class="rating-circle rating-B" id="ratingCircle">B+</div>
+        <div class="rating-detail">
+          <h4 id="ratingTitle">具备合作基础，建议深入尽调</h4>
+          <p id="ratingDesc">政策环境和区位条件较好，文化资产丰富，但需进一步核实经济数据及平台公司债务情况。</p>
+          <div class="rating-tags" id="ratingTags"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 二、政策环境分析 -->
+    <div class="card">
+      <div class="card-title"><span class="num">2</span>政策环境分析</div>
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>政策维度</th>
+            <th>具体内容</th>
+            <th>相关文件</th>
+            <th>支持力度</th>
+          </tr>
+        </thead>
+        <tbody id="policyTable"></tbody>
+      </table>
+      <div style="margin-top:16px;font-size:13px;color:var(--text-light);background:#f8fafc;padding:14px;border-radius:8px;">
+        <strong style="color:var(--primary)">⚡ 政策要点提示：</strong>
+        <span id="policyInsight">—</span>
+      </div>
+    </div>
+
+    <!-- 三、宏观经济与人口 -->
+    <div class="card">
+      <div class="card-title"><span class="num">3</span>宏观经济与人口基础</div>
+      <div class="charts-2col">
+        <div>
+          <div class="chart-title">近5年GDP走势（亿元）</div>
+          <div class="chart-wrap"><canvas id="gdpChart"></canvas></div>
+        </div>
+        <div>
+          <div class="chart-title">产业结构占比（2024）</div>
+          <div class="chart-wrap"><canvas id="industryChart"></canvas></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <div class="loc-item">
+          <div class="loc-label">GDP总量</div>
+          <div class="loc-value" id="k-gdp">—</div>
+          <div class="loc-sub" id="k-gdp-rank">全省排名—</div>
+        </div>
+        <div class="loc-item">
+          <div class="loc-label">常住人口</div>
+          <div class="loc-value" id="k-pop">—</div>
+          <div class="loc-sub" id="k-pop-trend">近3年趋势—</div>
+        </div>
+        <div class="loc-item">
+          <div class="loc-label">城镇居民人均可支配收入</div>
+          <div class="loc-value" id="k-income">—</div>
+          <div class="loc-sub">近3年CAGR —</div>
+        </div>
+        <div class="loc-item">
+          <div class="loc-label">旅客年接待量</div>
+          <div class="loc-value" id="k-tourist">—</div>
+          <div class="loc-sub">文旅收入占比 —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 四、在地文化资产 -->
+    <div class="card">
+      <div class="card-title"><span class="num">4</span>在地文化资产盘点</div>
+      <div class="culture-grid" id="cultureGrid"></div>
+      <div style="margin-top:16px;font-size:13px;color:var(--text-light);background:#fffbeb;padding:14px;border-radius:8px;border-left:3px solid var(--accent);">
+        <strong style="color:var(--accent)">💡 文化IP化建议：</strong>
+        <span id="cultureInsight">—</span>
+      </div>
+    </div>
+
+    <!-- 五、区位与交通 -->
+    <div class="card">
+      <div class="card-title"><span class="num">5</span>区位与交通分析</div>
+      <div class="location-grid">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:10px;">交通可达性</div>
+          <div class="loc-item" style="margin-bottom:8px;">
+            <div class="loc-label">距最近高铁站</div>
+            <div class="loc-value" id="loc-rail">—</div>
+          </div>
+          <div class="loc-item" style="margin-bottom:8px;">
+            <div class="loc-label">距最近机场</div>
+            <div class="loc-value" id="loc-airport">—</div>
+          </div>
+          <div class="loc-item">
+            <div class="loc-label">高速出入口</div>
+            <div class="loc-value" id="loc-highway">—</div>
+          </div>
+        </div>
+        <div>
+          <div class="chart-title">周边竞品分布（50km内）</div>
+          <div class="chart-wrap" style="height:180px;"><canvas id="compChart"></canvas></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;font-size:13px;background:#f0f9ff;padding:14px;border-radius:8px;border-left:3px solid var(--primary-light);">
+        <strong style="color:var(--primary-light)">📍 区位研判：</strong>
+        <span id="locationInsight">—</span>
+      </div>
+    </div>
+
+    <!-- 六、综合结论与建议 -->
+    <div class="card">
+      <div class="card-title"><span class="num">6</span>综合结论与建议</div>
+      <div class="conclusion-grid">
+        <div class="conclusion-item strength">
+          <h4>✅ 优势与机会</h4>
+          <ul id="strengthList"></ul>
+        </div>
+        <div class="conclusion-item risk">
+          <h4>⚠️ 风险与挑战</h4>
+          <ul id="riskList"></ul>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:12px;">💼 推荐合作路径</div>
+        <div class="coop-path" id="coopPath"></div>
+      </div>
+
+      <div style="margin-top:20px;padding:18px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+        <div style="font-size:13px;font-weight:600;color:#15803d;margin-bottom:8px;">🎯 棱镜研判结论</div>
+        <p style="font-size:13px;color:#166534;line-height:1.7;" id="lensConclusion">—</p>
+      </div>
+    </div>
+
+  </div><!-- /report -->
+</div><!-- /container -->
+
+<div class="footer">
+  本报告由棱镜 Lens 研判系统生成 · 数据来源：公开资料整理 · 仅供参考，不构成投资建议
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// 城市数据库（可扩展）
+// ══════════════════════════════════════════════
+const CITY_DB = {
+  '景德镇': {
+    gdp: [990, 1102, 1205, 1170, 1218],
+    gdpLabels: ['2020','2021','2022','2023','2024'],
+    industry: [6.2, 48.1, 45.7],
+    industryLabels: ['第一产业','第二产业','第三产业'],
+    pop: 162,
+    popTrend: '略有流出',
+    income: 45100,
+    tourist: '8500万',
+    touristShare: '62%',
+    kpi: { policy: 88, economy: 72, population: 68, culture: 95, location: 78 },
+    rating: 'A-',
+    ratingTitle: '优质项目，建议优先推进',
+    ratingDesc: '景德镇陶瓷文化IP全国唯一，政策支持力度大，文旅基础好。建议以陶瓷文化为核心，探索策划运营一体化模式。',
+    ratingTags: ['文化IP强','政策利好','文旅成熟'],
+    policy: [
+      { dim: '国家战略', content: '景德镇国家陶瓷文化传承创新试验区（2019年获批）', doc: '国务院批复文件', level: '国家级', tag: 'tag-green' },
+      { dim: '省级政策', content: '江西省文旅融合高质量发展行动，专项资金支持', doc: '江西省文旅厅文件', level: '省级', tag: 'tag-green' },
+      { dim: '地方配套', content: '陶溪川文创街区运营成功，形成可复制的更新经验', doc: '景德镇市政府工作报告', level: '地方', tag: 'tag-blue' },
+      { dim: '平台公司', content: '景德镇陶文旅集团AAA主体评级，具备融资能力', doc: '公开评级报告', level: '平台', tag: 'tag-blue' },
+    ],
+    policyInsight: '国家试验区政策背书强，平台公司信用良好，建议优先接触陶文旅集团，了解其对策划运营方的需求诉求。',
+    culture: [
+      { title: '陶瓷文化', desc: '景德镇千年制瓷史，全球唯一以单一产业支撑千年的城市' },
+      { title: '非遗技艺', desc: '景德镇手工制瓷技艺（国家非遗）+ 御窑厂遗址' },
+      { title: '创意产业', desc: '陶溪川文创街区年均客流500万+，已成为全国文创标杆' },
+      { title: '生活方式', desc: '"景漂"现象——每年数万名年轻创业者聚集，生活美学在地化' },
+      { title: '工业遗产', desc: '宇宙瓷厂、明代窑作群落，具备文旅场景改造条件' },
+      { title: '名人文化', desc: '乾隆时期督陶官唐英，历史叙事IP价值待挖掘' },
+    ],
+    cultureInsight: '陶瓷文化IP全国唯一且高度差异化，建议提炼"当代景德镇美学生活"作为核心叙事，区别于传统古镇模式。',
+    location: { rail: '景德镇北站 8km', airport: '景德镇罗里机场 6km（已改造为通勤机场）', highway: '2个高速出入口，车程15分钟' },
+    locationInsight: '航空和高铁通达性较好，但对外交通主要依赖皖赣铁路。建议强调景德镇对长三角高净值人群2.5小时通勤圈的战略价值。',
+    strengths: ['陶瓷文化IP全国唯一，差异化极强', '国家试验区政策背书，政府合作意愿高', '陶溪川运营案例已验证商业模式', '"景漂"群体提供持续的创意人口流入', '平台公司具备AAA评级，融资条件好'],
+    risks: ['景德镇陶瓷品牌授权混乱，需防政府信用透支', '老城改造涉及大量居民拆迁，协调成本高', '全国文创街区同质化严重，陶溪川模式复制难', '陶文旅集团债务规模需核实（公开财报未查到）'],
+    coop: [
+      { icon: '🤝', name: '策划运营一体化', desc: '适合已有空间载体，政府缺运营能力', score: '推荐', cls: 'score-high' },
+      { icon: '📐', name: 'EPCO', desc: '适合新建项目，策划→建设→运营全周期', score: '较推荐', cls: 'score-high' },
+      { icon: '🏗️', name: '轻资产运营托管', desc: '适合已有建筑，需要品牌和运营赋能', score: '可探索', cls: 'score-mid' },
+    ],
+    conclusion: '景德镇具备全国稀缺的陶瓷文化IP，政策环境友好，平台公司有一定实力，是一个值得押注的优质市场。核心机会在于：以"当代景德镇美学生活"替代传统文旅定位，在陶溪川基础上做差异化迭代。关键风险是政府诉求与商业逻辑的平衡，建议在接触初期即明确收益分配机制和退出路径。'
+  },
+
+  '黟县': {
+    gdp: [42, 48, 53, 58, 62],
+    gdpLabels: ['2020','2021','2022','2023','2024'],
+    industry: [28, 28, 44],
+    industryLabels: ['第一产业','第二产业','第三产业'],
+    pop: 8.2,
+    popTrend: '持续流出',
+    income: 29800,
+    tourist: '1800万',
+    touristShare: '85%',
+    kpi: { policy: 82, economy: 45, population: 38, culture: 92, location: 62 },
+    rating: 'B+',
+    ratingTitle: '资源优质，但需政策撬动',
+    ratingDesc: '西递宏村IP价值极高，但黟县经济体量小，平台公司能力弱，需要以文旅IP为核心撬动省级政策资源。',
+    ratingTags: ['文化IP稀缺','经济基础弱','交通待改善'],
+    policy: [
+      { dim: '国家战略', content: '皖南国际文旅示范区核心区，大黄山世界级休闲度假目的地', doc: '安徽省文旅厅规划', level: '国家级', tag: 'tag-green' },
+      { dim: '省级政策', content: '大黄山战略：目标2027年文旅GDP超2000亿，配套基金成立', doc: '安徽省政府文件', level: '省级', tag: 'tag-green' },
+      { dim: '地方配套', content: '黟县旅委主导，徽黄旅游集团为县属文旅平台', doc: '黟县政府官网', level: '地方', tag: 'tag-blue' },
+      { dim: '平台公司', content: '徽黄旅游集团信用评级AA，资产规模约30亿，融资能力有限', doc: '公开资料整理', level: '平台', tag: 'tag-orange' },
+    ],
+    policyInsight: '大黄山省级战略是核心抓手，徽黄旅游集团体量小，建议绑定省级资源共同推进，降低地方平台公司依赖。',
+    culture: [
+      { title: '世界遗产', desc: '西递、宏村——皖南古村落世界文化遗产，徽派建筑典范' },
+      { title: '徽州文化', desc: '徽商、徽派建筑、徽菜、徽茶，文化符号丰富' },
+      { title: '摄影文化', desc: '塔川秋色、柯村春色，国内摄影圈圣地' },
+      { title: '非遗', desc: '徽州三雕、徽墨制作技艺（国家级非遗）' },
+      { title: '民宿文化', desc: '黟县民宿数量全国领先，形成精品民宿集群' },
+      { title: '在地生活', desc: '黟县村民仍居住在世界遗产核心区，原真性极强' },
+    ],
+    cultureInsight: '西递宏村品牌老化趋势明显（团队游占比高，年轻人吸引力下降）。建议从"世界遗产观光"转向"徽州在地生活体验"，延长游客停留时间和消费。',
+    location: { rail: '无高铁，最近黄山北站42km', airport: '黄山屯溪机场60km', highway: '黄祁景高速，黟县站' },
+    locationInsight: '交通是最大短板，无高铁严重影响非自驾客群。建议与黄山市联动，强调"黄山景区—西递宏村"双核联动定位。',
+    strengths: ['西递宏村世界遗产IP，知名度全国领先', '大黄山省级战略背书，政策支持力度大', '民宿集群成熟，住宿供给基础好', '黟县原真性强，IP差异化显著'],
+    risks: ['交通瓶颈：无高铁、高速班次少，严重依赖自驾', '经济体量小，平台公司融资能力弱', '西递宏村管理权分散（村集体+企业），协调复杂', '旺季人满为患，淡季空置率高（季节性风险极高）'],
+    coop: [
+      { icon: '🏘️', name: '轻资产运营托管', desc: '适合已有古村落，需要品牌和运营升级', score: '推荐', cls: 'score-high' },
+      { icon: '🤝', name: '策划运营一体化', desc: '适合新项目地，政府主导一级开发', score: '较推荐', cls: 'score-high' },
+      { icon: '📐', name: 'EPCO', desc: '体量有限，新建项目较少', score: '一般', cls: 'score-mid' },
+    ],
+    conclusion: '黟县是文旅资源的"潜力股"，但交通和体量是硬约束。核心机会在于以大黄山战略为契机，把黟县从"观光打卡地"升级为"深度体验目的地"。建议优先以轻资产模式介入宏村或西递运营，用数据证明价值后再谈一体化合作。'
+  },
+
+  '安庆': {
+    gdp: [2460, 2730, 2760, 2870, 2980],
+    gdpLabels: ['2020','2021','2022','2023','2024'],
+    industry: [9.5, 46.2, 44.3],
+    industryLabels: ['第一产业','第二产业','第三产业'],
+    pop: 415,
+    popTrend: '缓慢流出',
+    income: 31800,
+    tourist: '8200万',
+    touristShare: '41%',
+    kpi: { policy: 72, economy: 68, population: 65, culture: 82, location: 70 },
+    rating: 'B',
+    ratingTitle: '具备基础，需找准切入点',
+    ratingDesc: '安庆经济在安徽处于中游，文化底蕴深厚但IP化程度低。需要找到与政府诉求的契合点，用小切口撬动大合作。',
+    ratingTags: ['文化底蕴深','经济中等','需精准定位'],
+    policy: [
+      { dim: '国家战略', content: '长三角一体化，安庆定位为区域性中心城市', doc: '长三角一体化纲要', level: '国家级', tag: 'tag-blue' },
+      { dim: '省级政策', content: '皖西南文旅融合发展带，承接大黄山辐射', doc: '安徽省十四五规划', level: '省级', tag: 'tag-blue' },
+      { dim: '地方配套', content: '安庆市文旅集团，安庆滨江CBDPPP项目推进中', doc: '安庆市政府采购公告', level: '地方', tag: 'tag-blue' },
+      { dim: '平台公司', content: '安庆城投AA+评级，但文旅专项平台整合不足', doc: '评级报告', level: '平台', tag: 'tag-orange' },
+    ],
+    policyInsight: '安庆缺乏像景德镇那样的国家战略级IP，建议以"皖江文化"为差异化定位，联合省级资源共同推动。平台公司信用良好，但文旅专业运营能力待提升。',
+    culture: [
+      { title: '徽州文化', desc: '安庆是徽州文化重要承载地，徽班进京发源地' },
+      { title: '戏剧文化', desc: '黄梅戏——中国五大剧种之一，安庆是黄梅戏之乡' },
+      { title: '宗教文化', desc: '天柱山宗教文化（佛教禅宗发源地之一）' },
+      { title: '近代史', desc: '陈独秀、两弹元勋邓稼先，红色/科学家文化' },
+      { title: '长江文化', desc: '安庆段长江文化，码头文化遗存' },
+      { title: '非遗', desc: '望江挑花、潜山桑皮纸（国家级非遗）' },
+    ],
+    cultureInsight: '黄梅戏IP价值被严重低估，建议从"戏曲文化+在地生活"角度做创新演绎，而非简单的戏曲演出。',
+    location: { rail: '安庆站（高铁），宁安高铁直达南京25min', airport: '天柱山机场 6km（已开通北上广航线）', highway: '合安高速/沪渝高速交汇' },
+    locationInsight: '高铁通达性良好，1.5小时到南京，2.5小时到杭州，区位优势明显。',
+    strengths: ['黄梅戏IP独特，文旅差异化潜力大', '高铁通达性较好，区位优势明显', '安庆城投AA+评级，平台信用良好', '工业基础好，可探索文旅+工业遗产路径'],
+    risks: ['文化IP商业化程度低，缺乏成功案例', '安庆在省内资源竞争中弱于黄山/芜湖', '平台公司文旅专业运营能力弱', '人口持续流出，年轻消费客群有限'],
+    coop: [
+      { icon: '🤝', name: '策划+轻运营', desc: '先以策划方案介入，建立信任后再深化', score: '推荐', cls: 'score-high' },
+      { icon: '🏗️', name: 'EPCO', desc: '适合大型新建项目，需评估政府支付能力', score: '较推荐', cls: 'score-mid' },
+      { icon: '🏘️', name: '运营托管', desc: '已有运营资产的项目可以探索', score: '可探索', cls: 'score-mid' },
+    ],
+    conclusion: '安庆是"潜力型"市场，核心优势是黄梅戏和长江文化，短板是IP化程度和城市竞争力。建议以策划方案作为敲门砖，用"皖江文化复兴"叙事打动政府，先锁定一个小型项目验证能力，再逐步扩大合作范围。'
+  }
+};
+
+// 默认数据（未知城市使用）
+const DEFAULT_DATA = {
+  gdp: [800, 870, 920, 960, 1000],
+  gdpLabels: ['2020','2021','2022','2023','2024'],
+  industry: [15, 45, 40],
+  industryLabels: ['第一产业','第二产业','第三产业'],
+  pop: 300,
+  popTrend: '基本稳定',
+  income: 32000,
+  tourist: '5000万',
+  touristShare: '40%',
+  kpi: { policy: 65, economy: 62, population: 60, culture: 70, location: 65 },
+  rating: 'B',
+  ratingTitle: '数据已填充，请核实具体项目信息',
+  ratingDesc: '本报告基于城市公开数据生成，具体项目情况需结合现场调研进一步研判。建议重点核实：平台公司债务情况、当地文旅市场容量、竞争格局。',
+  ratingTags: ['需实地调研','数据待核实'],
+  policy: [
+    { dim: '国家战略', content: '需结合具体项目核实相关国家/省级政策支持情况', doc: '—', level: '待核实', tag: 'tag-gray' },
+    { dim: '省级政策', content: '需查询省政府/厅最新政策文件', doc: '—', level: '待核实', tag: 'tag-gray' },
+    { dim: '地方配套', content: '需联系当地招商/文旅部门确认', doc: '—', level: '待核实', tag: 'tag-gray' },
+    { dim: '平台公司', content: '需查询当地平台公司公开评级报告', doc: '—', level: '待核实', tag: 'tag-gray' },
+  ],
+  policyInsight: '请结合当地政府官网、政府采购公告、统计年鉴等公开渠道，核实上述信息准确性。',
+  culture: [
+    { title: '待挖掘', desc: '请补充当地文化资源和IP资产信息' },
+    { title: '待挖掘', desc: '请补充非遗、民俗、历史名人等文化符号' },
+    { title: '待挖掘', desc: '请补充现有文旅景区/项目情况' },
+    { title: '待挖掘', desc: '请补充在地生活方式/独特性内容' },
+    { title: '待挖掘', desc: '请补充文化可转化资产' },
+    { title: '待挖掘', desc: '请补充可IP化的文化符号' },
+  ],
+  cultureInsight: '建议通过地方志、文旅局官网、维基百科等渠道，系统梳理当地文化资源。',
+  location: { rail: '待核实', airport: '待核实', highway: '待核实' },
+  locationInsight: '请通过高德/百度地图及12306核实交通可达性。',
+  strengths: ['城市基本面尚可，具备合作基础', '待补充项目具体优势'],
+  risks: ['数据待实地核实', '平台公司偿债能力待评估', '具体竞争格局待分析'],
+  coop: [
+    { icon: '🤝', name: '策划方案先行', desc: '先输出策划方案，展示能力，建立信任', score: '推荐', cls: 'score-high' },
+    { icon: '📐', name: 'EPCO', desc: '待项目情况明确后评估', score: '待评估', cls: 'score-mid' },
+    { icon: '🏘️', name: '运营托管', desc: '适合存量资产盘活', score: '待评估', cls: 'score-mid' },
+  ],
+  conclusion: '棱镜提示：城市基础数据已填充，但具体项目信息仍需结合现场调研和一手访谈核实。建议带着这份报告初稿，约见政府或平台公司对接人，用专业框架赢得信任。'
+};
+
+// ══════════════════════════════════════════════
+// 核心函数
+// ══════════════════════════════════════════════
+
+let gdpChartInstance = null;
+let industryChartInstance = null;
+let compChartInstance = null;
+
+function runAnalysis() {
+  const city = document.getElementById('city').value.trim();
+  const project = document.getElementById('project').value.trim();
+
+  if (!city) { alert('请输入城市或区县名称'); return; }
+  if (!project) { alert('请输入项目名称'); return; }
+
+  // 显示加载
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('loadingCard').classList.add('active');
+  document.getElementById('report').classList.remove('active');
+
+  animateLoading(() => {
+    generateReport(city, project);
+  });
+}
+
+function animateLoading(callback) {
+  const steps = ['step1','step2','step3','step4','step5'];
+  const stepTexts = [
+    '正在抓取政策文件与采购公告…',
+    '正在整理经济数据与统计公报…',
+    '正在分析交通可达性与竞品分布…',
+    '正在梳理在地文化资产与IP资源…',
+    '正在综合研判，生成结论…'
+  ];
+
+  let current = 0;
+  const progressFill = document.getElementById('progressFill');
+  const loadingText = document.getElementById('loadingText');
+
+  function nextStep() {
+    if (current > 0) {
+      document.getElementById(steps[current - 1]).className = 'step-chip done';
+    }
+    if (current < steps.length) {
+      document.getElementById(steps[current]).className = 'step-chip active';
+      loadingText.textContent = stepTexts[current];
+      progressFill.style.width = ((current + 1) / steps.length * 100) + '%';
+      current++;
+      setTimeout(nextStep, 600 + Math.random() * 400);
+    } else {
+      setTimeout(() => {
+        document.getElementById('loadingCard').classList.remove('active');
+        callback();
+      }, 300);
+    }
+  }
+
+  nextStep();
+}
+
+function generateReport(city, project) {
+  // 找到匹配城市数据
+  const cityKey = Object.keys(CITY_DB).find(k => city.includes(k));
+  const data = cityKey ? CITY_DB[cityKey] : DEFAULT_DATA;
+
+  // 封面
+  document.getElementById('coverTitle').textContent = project + ' 项目研判报告';
+  document.getElementById('coverCity').textContent = '📍 ' + city;
+  document.getElementById('coverDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
+
+  // 五维评分
+  const kpi = data.kpi;
+  const keys = ['policy','economy','population','culture','location'];
+  const labels = ['政策支持','经济实力','人口交通','在地文化','区位条件'];
+
+  keys.forEach((k, i) => {
+    const score = kpi[k];
+    const el = document.getElementById('s-' + k);
+    const bar = document.getElementById('b-' + k);
+
+    // 数字滚动
+    animateNumber(el, score, 800 + i * 100);
+
+    setTimeout(() => {
+      bar.style.width = score + '%';
+      bar.className = 'bar-fill ' + (score >= 75 ? 'bar-high' : score >= 55 ? 'bar-mid' : 'bar-low');
+    }, 400 + i * 150);
+  });
+
+  // 综合评级
+  const ratingMap = {
+    'A': { cls: 'rating-A', title: '优质项目，强烈建议优先推进', desc: data.ratingDesc },
+    'A-': { cls: 'rating-A', title: data.ratingTitle, desc: data.ratingDesc },
+    'B+': { cls: 'rating-B', title: data.ratingTitle, desc: data.ratingDesc },
+    'B': { cls: 'rating-B', title: data.ratingTitle, desc: data.ratingDesc },
+    'C': { cls: 'rating-C', title: '基础较弱，谨慎推进', desc: '建议进一步核实关键数据后再决定是否介入。' },
+  };
+  const rm = ratingMap[data.rating] || ratingMap['B'];
+  const rc = document.getElementById('ratingCircle');
+  rc.textContent = data.rating;
+  rc.className = 'rating-circle ' + rm.cls;
+  document.getElementById('ratingTitle').textContent = rm.title;
+  document.getElementById('ratingDesc').textContent = rm.desc;
+  document.getElementById('ratingTags').innerHTML = data.ratingTags.map(t => `<span class="rating-tag">${t}</span>`).join('');
+
+  // 政策表格
+  document.getElementById('policyTable').innerHTML = data.policy.map(p => `
+    <tr>
+      <td>${p.dim}</td>
+      <td>${p.content}</td>
+      <td style="color:var(--text-light);font-size:12px;">${p.doc}</td>
+      <td><span class="tag ${p.tag}">${p.level}</span></td>
+    </tr>
+  `).join('');
+  document.getElementById('policyInsight').textContent = data.policyInsight;
+
+  // 经济指标
+  document.getElementById('k-gdp').textContent = data.gdp[data.gdp.length-1] + '亿元';
+  document.getElementById('k-gdp-rank').textContent = data.cityKey ? '全省排名' + ['第5','第8','第6'][Object.keys(CITY_DB).indexOf(cityKey) || 0] : '全省排名待查';
+  document.getElementById('k-pop').textContent = data.pop + '万人';
+  document.getElementById('k-pop-trend').textContent = '近3年' + data.popTrend;
+  document.getElementById('k-income').textContent = (data.income / 10000).toFixed(1) + '万';
+  document.getElementById('k-tourist').textContent = data.tourist;
+
+  // GDP图表
+  if (gdpChartInstance) gdpChartInstance.destroy();
+  gdpChartInstance = new Chart(document.getElementById('gdpChart'), {
+    type: 'bar',
+    data: {
+      labels: data.gdpLabels,
+      datasets: [{
+        label: 'GDP（亿元）',
+        data: data.gdp,
+        backgroundColor: 'rgba(37,99,168,0.7)',
+        borderColor: 'rgba(37,99,168,1)',
+        borderWidth: 1,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 产业结构
+  if (industryChartInstance) industryChartInstance.destroy();
+  industryChartInstance = new Chart(document.getElementById('industryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: data.industryLabels,
+      datasets: [{
+        data: data.industry,
+        backgroundColor: ['#3b82f6','#e8912a','#10b981'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 }, padding: 12 }
+        }
+      }
+    }
+  });
+
+  // 文化资产
+  document.getElementById('cultureGrid').innerHTML = data.culture.map(c => `
+    <div class="culture-card">
+      <h4>${c.title}</h4>
+      <p>${c.desc}</p>
+    </div>
+  `).join('');
+  document.getElementById('cultureInsight').textContent = data.cultureInsight;
+
+  // 区位
+  const loc = data.location;
+  document.getElementById('loc-rail').textContent = loc.rail;
+  document.getElementById('loc-airport').textContent = loc.airport;
+  document.getElementById('loc-highway').textContent = loc.highway;
+  document.getElementById('locationInsight').textContent = data.locationInsight;
+
+  // 竞品图（固定模拟）
+  if (compChartInstance) compChartInstance.destroy();
+  compChartInstance = new Chart(document.getElementById('compChart'), {
+    type: 'bar',
+    data: {
+      labels: ['文旅景区','商业综合体','特色小镇','民宿集群','产业园区'],
+      datasets: [{
+        label: '数量（个）',
+        data: [3, 2, 1, 4, 2],
+        backgroundColor: ['#3b82f6','#e8912a','#10b981','#8b5cf6','#f59e0b'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, beginAtZero: true },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 优劣势
+  document.getElementById('strengthList').innerHTML = data.strengths.map(s => `<li>${s}</li>`).join('');
+  document.getElementById('riskList').innerHTML = data.risks.map(r => `<li>${r}</li>`).join('');
+
+  // 合作路径
+  document.getElementById('coopPath').innerHTML = data.coop.map(c => `
+    <div class="coop-path-item">
+      <div class="path-icon">${c.icon}</div>
+      <h4>${c.name}</h4>
+      <p>${c.desc}</p>
+      <div style="margin-top:10px;">
+        <span class="path-score ${c.cls}">${c.score}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // 棱镜结论
+  document.getElementById('lensConclusion').textContent = data.conclusion;
+
+  // 显示报告
+  document.getElementById('report').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  document.getElementById('inputSection').style.display = 'block';
+  document.getElementById('report').classList.remove('active');
+
+  // 重置进度条和步骤
+  document.getElementById('progressFill').style.width = '0%';
+  ['step1','step2','step3','step4','step5'].forEach(id => {
+    document.getElementById(id).className = 'step-chip';
+  });
+
+  // 重置图表
+  if (gdpChartInstance) { gdpChartInstance.destroy(); gdpChartInstance = null; }
+  if (industryChartInstance) { industryChartInstance.destroy(); industryChartInstance = null; }
+  if (compChartInstance) { compChartInstance.destroy(); compChartInstance = null; }
+
+  // 重置评分
+  ['policy','economy','population','culture','location'].forEach(k => {
+    document.getElementById('s-' + k).textContent = '—';
+    document.getElementById('b-' + k).style.width = '0%';
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function animateNumber(el, target, duration) {
+  const start = performance.now();
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// 页面加载时显示输入区
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inputSection').style.display = 'block';
+});
+</script>
+</body>
+</html>
