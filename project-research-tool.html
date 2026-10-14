@@ -706,6 +706,64 @@
     color: var(--text-light);
   }
 
+  /* ─── 政策工具卡 ─── */
+  .policy-tool-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .policy-tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--primary);
+  }
+  .policy-tool-card.available::before { background: #16a34a; }
+  .policy-tool-card.limited::before { background: #d97706; }
+  .policy-tool-card.potential::before { background: #2563eb; }
+  .policy-tool-card.unavailable::before { background: #e2e8f0; }
+  .policy-tool-card .tool-tag {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .policy-tool-card .tool-tag.green { background: #dcfce7; color: #15803d; }
+  .policy-tool-card .tool-tag.orange { background: #fef3c7; color: #b45309; }
+  .policy-tool-card .tool-tag.blue { background: #dbeafe; color: #1d4ed8; }
+  .policy-tool-card .tool-tag.gray { background: #f1f5f9; color: #64748b; }
+  .policy-tool-card .tool-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 3px;
+    padding-right: 50px;
+  }
+  .policy-tool-card .tool-en {
+    font-size: 10px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+  .policy-tool-card .tool-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .policy-tool-card .tool-desc {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.4;
+  }
+  .policy-tool-card.unavailable { background: #f8fafc; }
+  .policy-tool-card.unavailable .tool-name { color: #94a3b8; }
+
   /* ─── 文化资产模块 ─── */
   .culture-stat-card {
     background: var(--bg);
@@ -1062,7 +1120,14 @@
     <!-- 二、政策环境分析 -->
     <div class="card">
       <div class="card-title"><span class="num">2</span>政策环境分析</div>
-      <table class="policy-table">
+
+      <!-- 政策工具类型速览 -->
+      <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:12px;">可用政策工具（按类型分类）</div>
+      <div id="policyToolsGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;"></div>
+
+      <!-- 政策梳理表格 -->
+      <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:10px;">政策文件清单</div>
+      <table class="policy-table" style="margin-bottom:16px;">
         <thead>
           <tr>
             <th>政策维度</th>
@@ -1073,8 +1138,9 @@
         </thead>
         <tbody id="policyTable"></tbody>
       </table>
-      <div style="margin-top:16px;font-size:13px;color:var(--text-light);background:#f8fafc;padding:14px;border-radius:8px;">
-        <strong style="color:var(--primary)">⚡ 政策要点提示：</strong>
+
+      <div style="font-size:13px;color:var(--text-light);background:#f0fdf4;padding:14px;border-radius:8px;border-left:3px solid #16a34a;">
+        <strong style="color:#15803d;">⚡ 政策要点提示：</strong>
         <span id="policyInsight">—</span>
       </div>
     </div>
@@ -1246,7 +1312,16 @@ const CITY_DB = {
       { dim: '地方配套', content: '陶溪川文创街区运营成功，形成可复制的更新经验', doc: '景德镇市政府工作报告', level: '地方', tag: 'tag-blue' },
       { dim: '平台公司', content: '景德镇陶文旅集团AAA主体评级，具备融资能力', doc: '公开评级报告', level: '平台', tag: 'tag-blue' },
     ],
-    policyInsight: '国家试验区政策背书强，平台公司信用良好，建议优先接触陶文旅集团，了解其对策划运营方的需求诉求。',
+    policyTools: [
+      { name: 'EOD', en: '生态导向开发', amount: '可申报', status: 'available', statusLabel: 'green', desc: '入库后可获国开行/农发行低息贷款，额度视项目规模而定', color: '#16a34a' },
+      { name: '专项债', en: '地方政府专项债券', amount: '3-8亿', status: 'available', statusLabel: 'green', desc: '文旅专项/生态修复专项，景德镇有成功申报先例', color: '#16a34a' },
+      { name: '中央财政资金', en: '转移支付/专项资金', amount: '2000-5000万', status: 'available', statusLabel: 'green', desc: '国家试验区专项补贴，文旅融合专项资金可申请', color: '#16a34a' },
+      { name: 'TOD', en: '交通导向开发', amount: '视情', status: 'potential', statusLabel: 'blue', desc: '高铁站周边综合开发可捆绑TOD模式，需与交通部门联动', color: '#2563eb' },
+      { name: 'PPP', en: '政府和社会资本合作', amount: '视项目', status: 'available', statusLabel: 'green', desc: '陶溪川更新项目有PPP操作经验，可参考', color: '#16a34a' },
+      { name: '政策性银行贷款', en: '国开行/农发行/进出银', amount: '5-15亿', status: 'available', statusLabel: 'green', desc: '陶文旅集团AAA评级可直接对接，利率3-4%', color: '#16a34a' },
+      { name: '城中村改造专项借款', en: '城中村改造借款', amount: '视规模', status: 'limited', statusLabel: 'orange', desc: '老城更新涉及城中村可申请，需符合住建部城中村认定标准', color: '#d97706' },
+      { name: 'REITs', en: '基础设施不动产信托', amount: '条件待评估', status: 'potential', statusLabel: 'blue', desc: '成熟运营资产可打包REITs，景德镇文旅资产尚未有先例', color: '#2563eb' },
+    ],    policyInsight: '国家试验区政策背书强，平台公司信用良好，建议优先接触陶文旅集团，了解其对策划运营方的需求诉求。',
     culture: {
       stats: { wenhuaDanwei: 18, feiyi: 14, aji: 12, guodian: 4, minsu: 8, wenhuaBu: 2.8 },
       statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
@@ -1303,7 +1378,16 @@ const CITY_DB = {
       { dim: '地方配套', content: '黟县旅委主导，徽黄旅游集团为县属文旅平台', doc: '黟县政府官网', level: '地方', tag: 'tag-blue' },
       { dim: '平台公司', content: '徽黄旅游集团信用评级AA，资产规模约30亿，融资能力有限', doc: '公开资料整理', level: '平台', tag: 'tag-orange' },
     ],
-    policyInsight: '大黄山省级战略是核心抓手，徽黄旅游集团体量小，建议绑定省级资源共同推进，降低地方平台公司依赖。',
+    policyTools: [
+      { name: 'EOD', en: '生态导向开发', amount: '可申报', status: 'available', statusLabel: 'green', desc: '大黄山生态保护红线区域适合EOD入库，获国开行低息贷款', color: '#16a34a' },
+      { name: '专项债', en: '地方政府专项债券', amount: '1-3亿', status: 'available', statusLabel: 'green', desc: '文旅专项债，西递宏村基础设施提升曾获省级专项支持', color: '#16a34a' },
+      { name: '中央财政资金', en: '转移支付/专项资金', amount: '1000-3000万', status: 'available', statusLabel: 'green', desc: '世界遗产保护专项资金、传统村落保护资金可申请', color: '#16a34a' },
+      { name: 'TOD', en: '交通导向开发', amount: '不适用', status: 'unavailable', statusLabel: 'gray', desc: '黟县无高铁站/地铁，TOD模式不适用', color: '#e2e8f0' },
+      { name: 'PPP', en: '政府和社会资本合作', amount: '体量受限', status: 'limited', statusLabel: 'orange', desc: '徽黄旅游集团体量小，PPP项目包装能力有限，需引入社会资本联合申报', color: '#d97706' },
+      { name: '政策性银行贷款', en: '国开行/农发行/进出银', amount: '2-5亿', status: 'limited', statusLabel: 'orange', desc: 'AA评级公司可对接，但资产规模受限，授信额度不高', color: '#d97706' },
+      { name: '城中村改造专项借款', en: '城中村改造借款', amount: '不适用', status: 'unavailable', statusLabel: 'gray', desc: '黟县以农村为主，无城中村改造政策适用条件', color: '#e2e8f0' },
+      { name: 'REITs', en: '基础设施不动产信托', amount: '条件不足', status: 'unavailable', statusLabel: 'gray', desc: '资产规模不达标，暂无REITs申报条件', color: '#e2e8f0' },
+    ],    policyInsight: '大黄山省级战略是核心抓手，徽黄旅游集团体量小，建议绑定省级资源共同推进，降低地方平台公司依赖。',
     culture: {
       stats: { wenhuaDanwei: 31, feiyi: 8, aji: 13, guodian: 21, minsu: 15, wenhuaBu: 1.4 },
       statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '世界遗产（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
@@ -1360,7 +1444,16 @@ const CITY_DB = {
       { dim: '地方配套', content: '安庆市文旅集团，安庆滨江CBDPPP项目推进中', doc: '安庆市政府采购公告', level: '地方', tag: 'tag-blue' },
       { dim: '平台公司', content: '安庆城投AA+评级，但文旅专项平台整合不足', doc: '评级报告', level: '平台', tag: 'tag-orange' },
     ],
-    policyInsight: '安庆缺乏像景德镇那样的国家战略级IP，建议以"皖江文化"为差异化定位，联合省级资源共同推动。平台公司信用良好，但文旅专业运营能力待提升。',
+    policyTools: [
+      { name: 'EOD', en: '生态导向开发', amount: '可申报', status: 'potential', statusLabel: 'blue', desc: '天柱山区域生态资源可申报EOD，需前期包装和入库', color: '#2563eb' },
+      { name: '专项债', en: '地方政府专项债券', amount: '2-5亿', status: 'available', statusLabel: 'green', desc: '安庆城投AA+可申报文旅专项/城镇化专项债', color: '#16a34a' },
+      { name: '中央财政资金', en: '转移支付/专项资金', amount: '1000-2000万', status: 'limited', statusLabel: 'orange', desc: '非国家重点区域，中央财政支持力度有限', color: '#d97706' },
+      { name: 'TOD', en: '交通导向开发', amount: '可探索', status: 'available', statusLabel: 'green', desc: '安庆站/安庆西站高铁枢纽可捆绑TOD，需与铁总/地方协调', color: '#16a34a' },
+      { name: 'PPP', en: '政府和社会资本合作', amount: '视项目', status: 'available', statusLabel: 'green', desc: '安庆城投有PPP操作经验，滨江CBD项目已落地', color: '#16a34a' },
+      { name: '政策性银行贷款', en: '国开行/农发行/进出银', amount: '5-10亿', status: 'available', statusLabel: 'green', desc: 'AA+评级城投可直接对接，额度较充裕', color: '#16a34a' },
+      { name: '城中村改造专项借款', en: '城中村改造借款', amount: '视规模', status: 'available', statusLabel: 'green', desc: '安庆市区存在城中村，棚改政策可与文旅项目联动', color: '#16a34a' },
+      { name: 'REITs', en: '基础设施不动产信托', amount: '条件待评估', status: 'potential', statusLabel: 'blue', desc: '成熟运营文旅资产可打包REITs，目前暂无先例', color: '#2563eb' },
+    ],    policyInsight: '安庆缺乏像景德镇那样的国家战略级IP，建议以"皖江文化"为差异化定位，联合省级资源共同推动。平台公司信用良好，但文旅专业运营能力待提升。',
     culture: {
       stats: { wenhuaDanwei: 14, feiyi: 6, aji: 12, guodian: 6, minsu: 10, wenhuaBu: 1.2 },
       statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
@@ -1419,7 +1512,17 @@ const DEFAULT_DATA = {
     { dim: '地方配套', content: '需联系当地招商/文旅部门确认', doc: '—', level: '待核实', tag: 'tag-gray' },
     { dim: '平台公司', content: '需查询当地平台公司公开评级报告', doc: '—', level: '待核实', tag: 'tag-gray' },
   ],
-  policyInsight: '请结合当地政府官网、政府采购公告、统计年鉴等公开渠道，核实上述信息准确性。',
+  policyTools: [
+    { name: 'EOD', en: '生态导向开发', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请结合项目属性核实是否符合EOD入库条件', color: '#2563eb' },
+    { name: '专项债', en: '地方政府专项债券', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请查询当地财政局专项债申报情况及额度', color: '#2563eb' },
+    { name: '中央财政资金', en: '转移支付/专项资金', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请查询省财政厅/文旅厅专项转移支付通知', color: '#2563eb' },
+    { name: 'TOD', en: '交通导向开发', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请核实项目地与最近交通枢纽关系', color: '#2563eb' },
+    { name: 'PPP', en: '政府和社会资本合作', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请核实当地平台公司PPP项目库入库情况', color: '#2563eb' },
+    { name: '政策性银行贷款', en: '国开行/农发行/进出银', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请查询当地城投主体评级及授信情况', color: '#2563eb' },
+    { name: '城中村改造专项借款', en: '城中村改造借款', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请核实项目是否涉及城中村更新范围', color: '#2563eb' },
+    { name: 'REITs', en: '基础设施不动产信托', amount: '待核实', status: 'potential', statusLabel: 'blue', desc: '请核实当地是否有成熟可运营文旅资产', color: '#2563eb' },
+  ],
+    policyInsight: '请结合当地政府官网、政府采购公告、统计年鉴等公开渠道，核实上述信息准确性。',
   culture: {
     stats: { wenhuaDanwei: '—', feiyi: '—', aji: '—', guodian: '—', minsu: '—', wenhuaBu: '—' },
     statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
@@ -1560,7 +1663,25 @@ function generateReport(city, project) {
   document.getElementById('ratingDesc').textContent = rm.desc;
   document.getElementById('ratingTags').innerHTML = data.ratingTags.map(t => `<span class="rating-tag">${t}</span>`).join('');
 
-  // 政策表格
+  // ─── 政策工具类型卡渲染 ───
+  const statusCfg = {
+    available: { cls: 'available', tag: 'green', label: '可用' },
+    limited: { cls: 'limited', tag: 'orange', label: '受限' },
+    potential: { cls: 'potential', tag: 'blue', label: '可探索' },
+    unavailable: { cls: 'unavailable', tag: 'gray', label: '不适用' },
+  };
+  const tools = data.policyTools || [];
+  document.getElementById('policyToolsGrid').innerHTML = tools.map(t => `
+    <div class="policy-tool-card ${statusCfg[t.status]?.cls || 'potential'}">
+      <span class="tool-tag ${statusCfg[t.status]?.tag || 'blue'}">${statusCfg[t.status]?.label || '待核实'}</span>
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-en">${t.en}</div>
+      <div class="tool-amount">${t.amount}</div>
+      <div class="tool-desc">${t.desc}</div>
+    </div>
+  `).join('');
+
+  // 政策文件表格
   document.getElementById('policyTable').innerHTML = data.policy.map(p => `
     <tr>
       <td>${p.dim}</td>
