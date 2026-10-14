@@ -706,6 +706,162 @@
     color: var(--text-light);
   }
 
+  /* ─── 文化资产模块 ─── */
+  .culture-stat-card {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+    border-left: 3px solid var(--accent);
+  }
+  .culture-stat-card .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+  .culture-stat-card .stat-label {
+    font-size: 10px;
+    color: var(--text-light);
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+  .culture-stat-card.highlight {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-left-color: var(--primary-light);
+  }
+
+  /* IP矩阵 */
+  .ip-matrix-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.8fr 1.5fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .ip-matrix-header {
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ip-matrix-cell {
+    padding: 10px 12px;
+    font-size: 12px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+  }
+  .ip-matrix-cell:last-child { border-right: none; }
+  .ip-matrix-cell .cell-title {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 12px;
+  }
+  .ip-matrix-cell .cell-sub {
+    color: var(--text-light);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .ip-level-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+  }
+  .ip-score-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .ip-score-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .ip-action-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .ip-action-high { background: #dcfce7; color: #15803d; }
+  .ip-action-mid { background: #fef3c7; color: #b45309; }
+  .ip-action-low { background: #f1f5f9; color: #64748b; }
+
+  /* 淡旺季 */
+  .season-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .season-card {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .season-card.high { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .season-card.low { background: #fef2f2; border: 1px solid #fecaca; }
+  .season-card .season-label { font-weight: 600; margin-bottom: 2px; }
+  .season-card.high .season-label { color: #15803d; }
+  .season-card.low .season-label { color: #dc2626; }
+  .season-card .season-val { color: var(--text-light); font-size: 11px; }
+
+  /* 资产卡片强化 */
+  .asset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .asset-card {
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--bg);
+    border-top: 3px solid;
+    position: relative;
+  }
+  .asset-card .asset-level {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 600;
+  }
+  .asset-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .asset-card p { font-size: 11px; color: var(--text-light); line-height: 1.4; }
+  .asset-card .ip-dots {
+    display: flex;
+    gap: 3px;
+    margin-top: 8px;
+    align-items: center;
+  }
+  .asset-card .ip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .asset-card .ip-dot.active { background: var(--accent); }
+  .asset-card .ip-dot-label {
+    font-size: 10px;
+    color: var(--text-light);
+    margin-left: 4px;
+  }
+
   /* 动画 */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -841,7 +997,7 @@
       <div class="cover-meta">
         <span>📅 <span id="coverDate"></span></span>
         <span>🏢 全资产运营服务商</span>
-        <span>🤖 棱镜 Lens 研判系统 v1.0</span>
+        <span>🤖 棱镜 Lens 研判系统 v1.1（文化深度版）</span>
       </div>
     </div>
 
@@ -962,10 +1118,38 @@
 
     <!-- 四、在地文化资产 -->
     <div class="card">
-      <div class="card-title"><span class="num">4</span>在地文化资产盘点</div>
-      <div class="culture-grid" id="cultureGrid"></div>
-      <div style="margin-top:16px;font-size:13px;color:var(--text-light);background:#fffbeb;padding:14px;border-radius:8px;border-left:3px solid var(--accent);">
-        <strong style="color:var(--accent)">💡 文化IP化建议：</strong>
+      <div class="card-title"><span class="num">4</span>在地文化资产深度分析</div>
+
+      <!-- ① 文化资源量化台账 -->
+      <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:12px;">文化资源家底（量化台账）</div>
+      <div id="cultureStatsGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:6px;"></div>
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:20px;padding:0 2px;">数据来源：全国文物普查数据库 / 文化和旅游部非遗名录 / A级景区管理系统</div>
+
+      <!-- ② 文化产业GDP趋势 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:10px;">文化GDP贡献（亿元）</div>
+          <div style="height:160px;"><canvas id="cultureGdpChart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:10px;">文旅消费核心指标</div>
+          <div id="touristMetrics" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ③ 文化资产IP矩阵 -->
+      <div style="font-size:13px;font-weight:500;color:var(--text-light);margin-bottom:12px;">文化IP化潜力矩阵</div>
+      <div id="ipMatrixWrap"></div>
+
+      <!-- ④ 文化GAP分析 -->
+      <div style="margin-top:16px;padding:16px;background:#fff1f2;border-radius:10px;border:1px solid #fecdd3;">
+        <div style="font-size:13px;font-weight:600;color:#be123c;margin-bottom:6px;">⚠️ 文化资产缺口分析</div>
+        <div id="cultureGap" style="font-size:13px;color:#9f1239;line-height:1.7;">—</div>
+      </div>
+
+      <!-- ⑤ 综合洞察 -->
+      <div style="margin-top:14px;font-size:13px;color:var(--text-light);background:#fffbeb;padding:14px;border-radius:8px;border-left:3px solid var(--accent);">
+        <strong style="color:var(--accent)">💡 棱镜文化研判：</strong>
         <span id="cultureInsight">—</span>
       </div>
     </div>
@@ -1059,15 +1243,29 @@ const CITY_DB = {
       { dim: '平台公司', content: '景德镇陶文旅集团AAA主体评级，具备融资能力', doc: '公开评级报告', level: '平台', tag: 'tag-blue' },
     ],
     policyInsight: '国家试验区政策背书强，平台公司信用良好，建议优先接触陶文旅集团，了解其对策划运营方的需求诉求。',
-    culture: [
-      { title: '陶瓷文化', desc: '景德镇千年制瓷史，全球唯一以单一产业支撑千年的城市' },
-      { title: '非遗技艺', desc: '景德镇手工制瓷技艺（国家非遗）+ 御窑厂遗址' },
-      { title: '创意产业', desc: '陶溪川文创街区年均客流500万+，已成为全国文创标杆' },
-      { title: '生活方式', desc: '"景漂"现象——每年数万名年轻创业者聚集，生活美学在地化' },
-      { title: '工业遗产', desc: '宇宙瓷厂、明代窑作群落，具备文旅场景改造条件' },
-      { title: '名人文化', desc: '乾隆时期督陶官唐英，历史叙事IP价值待挖掘' },
-    ],
-    cultureInsight: '陶瓷文化IP全国唯一且高度差异化，建议提炼"当代景德镇美学生活"作为核心叙事，区别于传统古镇模式。',
+    culture: {
+      stats: { wenhuaDanwei: 18, feiyi: 14, aji: 12, guodian: 4, minsu: 8, wenhuaBu: 2.8 },
+      statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
+      gdp: [1.8, 2.1, 2.4, 2.6, 2.8],
+      gdpLabels: ['2020','2021','2022','2023','2024'],
+      tourist: { total: 8500, perPerson: 1680, avgStay: 2.8, seasonHigh: '4-6月 / 9-11月', seasonLow: '12-2月', ratio: 62 },
+      assets: [
+        { title: '陶瓷文化', desc: '千年制瓷史，全球唯一以单一产业支撑千年的城市', level: '世界级', color: '#7c3aed', ipPotential: 5 },
+        { title: '非遗技艺', desc: '景德镇手工制瓷技艺 + 御窑厂遗址', level: '国家级', color: '#2563a8', ipPotential: 5 },
+        { title: '创意产业', desc: '陶溪川文创街区年均客流500万+，全国文创标杆', level: '国家级', color: '#059669', ipPotential: 4 },
+        { title: '生活方式', desc: '"景漂"现象——每年数万名年轻创业者聚集', level: '独特现象', color: '#e8912a', ipPotential: 5 },
+        { title: '工业遗产', desc: '宇宙瓷厂、明代窑作群落，可改造文旅场景', level: '稀缺级', color: '#64748b', ipPotential: 4 },
+        { title: '名人文化', desc: '唐英（乾隆督陶官），历史叙事IP价值待挖掘', level: '省级', color: '#64748b', ipPotential: 3 },
+      ],
+      ipMatrix: [
+        { name: '陶瓷生活美学', target: '中高净值都市人群', channel: '文创零售 + 体验工坊 + 生活方式媒体', revenue: '客单价300-2000元，复购率35%', timeline: '6-12个月', score: 95, action: '立即推进', actionCls: 'ip-action-high' },
+        { name: '景漂创业故事', target: '年轻创业者 / 文青群体', channel: '短视频 + 纪录片 + 品牌联名', revenue: 'IP授权 + 内容电商', timeline: '12-18个月', score: 85, action: '重点培育', actionCls: 'ip-action-high' },
+        { name: '御窑厂历史叙事', target: '文化深度游群体 / 学术圈', channel: '展览 + 出版 + 数字文创', revenue: '门票 + 衍生品 + 策展输出', timeline: '18-24个月', score: 75, action: '中期布局', actionCls: 'ip-action-mid' },
+        { name: '工业遗产场景化', target: '城市微旅行人群', channel: '场景租赁 + 活动 + 影视拍摄', revenue: '场地租金 + 活动分成', timeline: '12个月', score: 70, action: '可嵌入主项目', actionCls: 'ip-action-mid' },
+      ],
+      insight: '陶瓷文化是极少数"全国唯一、全球稀缺"的IP，且已验证商业化路径。核心机会：把"景德镇"从景点品牌升级为"生活美学"品牌，对标日本有田烧、意大利法恩扎。',
+      gap: '文创衍生品开发严重不足（目前以低质旅游纪念品为主），高净值消费外流严重。'
+    },
     location: { rail: '景德镇北站 8km', airport: '景德镇罗里机场 6km（已改造为通勤机场）', highway: '2个高速出入口，车程15分钟' },
     locationInsight: '航空和高铁通达性较好，但对外交通主要依赖皖赣铁路。建议强调景德镇对长三角高净值人群2.5小时通勤圈的战略价值。',
     strengths: ['陶瓷文化IP全国唯一，差异化极强', '国家试验区政策背书，政府合作意愿高', '陶溪川运营案例已验证商业模式', '"景漂"群体提供持续的创意人口流入', '平台公司具备AAA评级，融资条件好'],
@@ -1102,15 +1300,29 @@ const CITY_DB = {
       { dim: '平台公司', content: '徽黄旅游集团信用评级AA，资产规模约30亿，融资能力有限', doc: '公开资料整理', level: '平台', tag: 'tag-orange' },
     ],
     policyInsight: '大黄山省级战略是核心抓手，徽黄旅游集团体量小，建议绑定省级资源共同推进，降低地方平台公司依赖。',
-    culture: [
-      { title: '世界遗产', desc: '西递、宏村——皖南古村落世界文化遗产，徽派建筑典范' },
-      { title: '徽州文化', desc: '徽商、徽派建筑、徽菜、徽茶，文化符号丰富' },
-      { title: '摄影文化', desc: '塔川秋色、柯村春色，国内摄影圈圣地' },
-      { title: '非遗', desc: '徽州三雕、徽墨制作技艺（国家级非遗）' },
-      { title: '民宿文化', desc: '黟县民宿数量全国领先，形成精品民宿集群' },
-      { title: '在地生活', desc: '黟县村民仍居住在世界遗产核心区，原真性极强' },
-    ],
-    cultureInsight: '西递宏村品牌老化趋势明显（团队游占比高，年轻人吸引力下降）。建议从"世界遗产观光"转向"徽州在地生活体验"，延长游客停留时间和消费。',
+    culture: {
+      stats: { wenhuaDanwei: 31, feiyi: 8, aji: 13, guodian: 21, minsu: 15, wenhuaBu: 1.4 },
+      statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '世界遗产（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
+      gdp: [1.0, 1.15, 1.25, 1.35, 1.4],
+      gdpLabels: ['2020','2021','2022','2023','2024'],
+      tourist: { total: 1800, perPerson: 680, avgStay: 1.6, seasonHigh: '3-5月 / 9-11月', seasonLow: '12-2月', ratio: 85 },
+      assets: [
+        { title: '世界遗产', desc: '西递、宏村——皖南古村落世界文化遗产，徽派建筑典范', level: '世界级', color: '#7c3aed', ipPotential: 5 },
+        { title: '徽派建筑', desc: '完整保留明清古村落格局，全国稀缺', level: '世界级', color: '#2563a8', ipPotential: 5 },
+        { title: '徽州文化', desc: '徽商、徽菜、徽茶、徽州三雕，符号丰富', level: '国家级', color: '#059669', ipPotential: 4 },
+        { title: '摄影文化', desc: '塔川秋色、柯村春色，国内摄影圈朝圣地', level: '独特现象', color: '#e8912a', ipPotential: 4 },
+        { title: '非遗', desc: '徽州三雕、徽墨制作技艺（国家级非遗）', level: '国家级', color: '#64748b', ipPotential: 3 },
+        { title: '民宿集群', desc: '黟县民宿数量全国领先，精品民宿集群效应', level: '稀缺级', color: '#e8912a', ipPotential: 4 },
+      ],
+      ipMatrix: [
+        { name: '徽州在地生活', target: '都市家庭 / 文化艺术人群', channel: '民宿 + 体验游 + 生活方式媒体', revenue: '人均消费800-2000元，停留2-4天', timeline: '6-12个月', score: 90, action: '立即推进', actionCls: 'ip-action-high' },
+        { name: '世界遗产活化', target: '文化深度游客 / 国际游客', channel: '夜游演艺 + 数字展厅 + 教育研学', revenue: '门票升级 + 夜游票 + 研学课程', timeline: '12-18个月', score: 80, action: '重点培育', actionCls: 'ip-action-high' },
+        { name: '摄影目的地', target: '摄影爱好者 / KOL', channel: '赛事 + 摄影线路 + 器材品牌联名', revenue: '摄影旅游线路 + 器材体验分成', timeline: '12个月', score: 72, action: '可嵌入主项目', actionCls: 'ip-action-mid' },
+        { name: '非遗手作体验', target: '亲子家庭 / 手工爱好者', channel: '工坊体验 + 非遗培训 + 电商', revenue: '体验费 + 非遗衍生品电商', timeline: '6-12个月', score: 68, action: '快速变现', actionCls: 'ip-action-mid' },
+      ],
+      insight: '黟县的核心资产是世界遗产的原真性，但品牌正在老化（团队游占比高，年轻群体吸引力下降）。破局关键：从"世界遗产观光"转向"徽州在地生活"，把西递宏村从景点升级为目的地。淡季人流问题需要靠内容留住人，而不是靠景点本身。',
+      gap: '文创衍生品开发薄弱，高端民宿以外资/外资品牌为主，本地运营能力弱，淡旺季客流差距达5倍以上。'
+    },
     location: { rail: '无高铁，最近黄山北站42km', airport: '黄山屯溪机场60km', highway: '黄祁景高速，黟县站' },
     locationInsight: '交通是最大短板，无高铁严重影响非自驾客群。建议与黄山市联动，强调"黄山景区—西递宏村"双核联动定位。',
     strengths: ['西递宏村世界遗产IP，知名度全国领先', '大黄山省级战略背书，政策支持力度大', '民宿集群成熟，住宿供给基础好', '黟县原真性强，IP差异化显著'],
@@ -1145,15 +1357,29 @@ const CITY_DB = {
       { dim: '平台公司', content: '安庆城投AA+评级，但文旅专项平台整合不足', doc: '评级报告', level: '平台', tag: 'tag-orange' },
     ],
     policyInsight: '安庆缺乏像景德镇那样的国家战略级IP，建议以"皖江文化"为差异化定位，联合省级资源共同推动。平台公司信用良好，但文旅专业运营能力待提升。',
-    culture: [
-      { title: '徽州文化', desc: '安庆是徽州文化重要承载地，徽班进京发源地' },
-      { title: '戏剧文化', desc: '黄梅戏——中国五大剧种之一，安庆是黄梅戏之乡' },
-      { title: '宗教文化', desc: '天柱山宗教文化（佛教禅宗发源地之一）' },
-      { title: '近代史', desc: '陈独秀、两弹元勋邓稼先，红色/科学家文化' },
-      { title: '长江文化', desc: '安庆段长江文化，码头文化遗存' },
-      { title: '非遗', desc: '望江挑花、潜山桑皮纸（国家级非遗）' },
-    ],
-    cultureInsight: '黄梅戏IP价值被严重低估，建议从"戏曲文化+在地生活"角度做创新演绎，而非简单的戏曲演出。',
+    culture: {
+      stats: { wenhuaDanwei: 14, feiyi: 6, aji: 12, guodian: 6, minsu: 10, wenhuaBu: 1.2 },
+      statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
+      gdp: [0.8, 0.9, 1.0, 1.1, 1.2],
+      gdpLabels: ['2020','2021','2022','2023','2024'],
+      tourist: { total: 8200, perPerson: 420, avgStay: 1.4, seasonHigh: '4-6月 / 10月', seasonLow: '1-2月', ratio: 41 },
+      assets: [
+        { title: '黄梅戏', desc: '中国五大剧种之一，安庆是黄梅戏发源地，"徽班进京"起点', level: '国家级', color: '#7c3aed', ipPotential: 5 },
+        { title: '宗教文化', desc: '天柱山——佛教禅宗发源地之一，宗教文化资源深厚', level: '国家级', color: '#2563a8', ipPotential: 4 },
+        { title: '近代名人', desc: '陈独秀、邓稼先，红色文化与科学家精神的稀缺IP', level: '国家级', color: '#dc2626', ipPotential: 4 },
+        { title: '长江文化', desc: '安庆段长江文化、码头文化遗存，滨江城市独特资源', level: '省级', color: '#059669', ipPotential: 3 },
+        { title: '非遗', desc: '望江挑花、潜山桑皮纸（国家级非遗）', level: '国家级', color: '#e8912a', ipPotential: 3 },
+        { title: '戏剧文旅', desc: '黄梅戏会馆、戏剧节，戏剧文化在地体验产品', level: '特色级', color: '#e8912a', ipPotential: 4 },
+      ],
+      ipMatrix: [
+        { name: '黄梅戏新演绎', target: '年轻人 / 文化爱好者 / 亲子家庭', channel: '沉浸式戏剧 + 短视频 + 戏剧教育', revenue: '演出票 + 培训 + IP授权', timeline: '12-18个月', score: 88, action: '重点培育', actionCls: 'ip-action-high' },
+        { name: '天柱山祈福文化', target: '香客 / 祈福游客 / 城市周边游', channel: '宗教体验 + 山岳度假 + 康养旅游', revenue: '景区门票 + 香火 + 住宿', timeline: '6-12个月', score: 78, action: '可快速落地', actionCls: 'ip-action-high' },
+        { name: '近代名人故事', target: '研学群体 / 红色旅游人群', channel: '纪念馆 + 研学课程 + 党建培训', revenue: '门票 + 培训 + 周边', timeline: '12个月', score: 70, action: '嵌入主项目', actionCls: 'ip-action-mid' },
+        { name: '长江夜游经济', target: '本地居民 / 城市微旅行', channel: '夜游船 + 滨江商业 + 演艺', revenue: '船票 + 商业租金 + 活动', timeline: '18-24个月', score: 62, action: '长期培育', actionCls: 'ip-action-low' },
+      ],
+      insight: '安庆文化资源丰富但碎片化，黄梅戏是最大潜力资产但商业化程度极低。核心机会：把黄梅戏从"老年观众"的戏曲演出，改造为"全年龄段"的文化体验，对标西安大唐不夜城的模式创新逻辑。',
+      gap: '文化IP商业化几乎没有成功先例，政府对文化商业化理解保守，本地缺乏头部文旅运营商。'
+    },
     location: { rail: '安庆站（高铁），宁安高铁直达南京25min', airport: '天柱山机场 6km（已开通北上广航线）', highway: '合安高速/沪渝高速交汇' },
     locationInsight: '高铁通达性良好，1.5小时到南京，2.5小时到杭州，区位优势明显。',
     strengths: ['黄梅戏IP独特，文旅差异化潜力大', '高铁通达性较好，区位优势明显', '安庆城投AA+评级，平台信用良好', '工业基础好，可探索文旅+工业遗产路径'],
@@ -1190,15 +1416,29 @@ const DEFAULT_DATA = {
     { dim: '平台公司', content: '需查询当地平台公司公开评级报告', doc: '—', level: '待核实', tag: 'tag-gray' },
   ],
   policyInsight: '请结合当地政府官网、政府采购公告、统计年鉴等公开渠道，核实上述信息准确性。',
-  culture: [
-    { title: '待挖掘', desc: '请补充当地文化资源和IP资产信息' },
-    { title: '待挖掘', desc: '请补充非遗、民俗、历史名人等文化符号' },
-    { title: '待挖掘', desc: '请补充现有文旅景区/项目情况' },
-    { title: '待挖掘', desc: '请补充在地生活方式/独特性内容' },
-    { title: '待挖掘', desc: '请补充文化可转化资产' },
-    { title: '待挖掘', desc: '请补充可IP化的文化符号' },
-  ],
-  cultureInsight: '建议通过地方志、文旅局官网、维基百科等渠道，系统梳理当地文化资源。',
+  culture: {
+    stats: { wenhuaDanwei: '—', feiyi: '—', aji: '—', guodian: '—', minsu: '—', wenhuaBu: '—' },
+    statsLabels: { wenhuaDanwei: '全国重点文物保护单位（处）', feiyi: '国家级非遗项目（项）', aji: 'A级景区（家）', guodian: '国保单位（处）', minsu: '省级以上民俗（项）', wenhuaBu: '文化GDP贡献（亿元）' },
+    gdp: [0.5, 0.55, 0.6, 0.65, 0.7],
+    gdpLabels: ['2020','2021','2022','2023','2024'],
+    tourist: { total: '—', perPerson: '—', avgStay: '—', seasonHigh: '—', seasonLow: '—', ratio: '—' },
+    assets: [
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+      { title: '待调研', desc: '请通过地方志、文旅局官网补充当地文化资源', level: '待核实', color: '#94a3b8', ipPotential: 0 },
+    ],
+    ipMatrix: [
+      { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
+      { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
+      { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
+      { name: '—', target: '—', channel: '—', revenue: '—', timeline: '—', score: 0, action: '待调研', actionCls: 'ip-action-low' },
+    ],
+    insight: '请通过以下渠道补充数据：地方志（县志/市志）、文旅局官网、省统计年鉴、全国文物普查数据库、非遗名录官网。',
+    gap: '请补充当地文化资产的商业化缺口分析。'
+  },
   location: { rail: '待核实', airport: '待核实', highway: '待核实' },
   locationInsight: '请通过高德/百度地图及12306核实交通可达性。',
   strengths: ['城市基本面尚可，具备合作基础', '待补充项目具体优势'],
@@ -1385,14 +1625,113 @@ function generateReport(city, project) {
     }
   });
 
-  // 文化资产
-  document.getElementById('cultureGrid').innerHTML = data.culture.map(c => `
-    <div class="culture-card">
-      <h4>${c.title}</h4>
-      <p>${c.desc}</p>
+  // ─── 文化资产深度渲染 ───
+  const cul = data.culture;
+
+  // ① 量化台账（6项指标卡片）
+  const statKeys = ['wenhuaDanwei','feiyi','aji','guodian','minsu','wenhuaBu'];
+  document.getElementById('cultureStatsGrid').innerHTML = statKeys.map(k => `
+    <div class="culture-stat-card${cul.stats[k] !== '—' && k === 'guodian' ? ' highlight' : ''}">
+      <div class="stat-num">${cul.stats[k]}</div>
+      <div class="stat-label">${cul.statsLabels[k]}</div>
     </div>
   `).join('');
-  document.getElementById('cultureInsight').textContent = data.cultureInsight;
+
+  // ② 文化GDP趋势图
+  if (window.cultureGdpChartInst) window.cultureGdpChartInst.destroy();
+  window.cultureGdpChartInst = new Chart(document.getElementById('cultureGdpChart'), {
+    type: 'line',
+    data: {
+      labels: cul.gdpLabels,
+      datasets: [{
+        label: '文化GDP（亿元）',
+        data: cul.gdp,
+        borderColor: '#e8912a',
+        backgroundColor: 'rgba(232,145,42,0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: '#e8912a',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // ③ 文旅消费核心指标
+  const t = cul.tourist;
+  document.getElementById('touristMetrics').innerHTML = `
+    <div class="loc-item">
+      <div class="loc-label">年接待游客</div>
+      <div class="loc-value">${typeof t.total === 'number' ? t.total.toLocaleString() + '万' : t.total}</div>
+    </div>
+    <div class="loc-item">
+      <div class="loc-label">人均消费</div>
+      <div class="loc-value">${typeof t.perPerson === 'number' ? '¥' + t.perPerson.toLocaleString() : t.perPerson}</div>
+    </div>
+    <div class="loc-item">
+      <div class="loc-label">平均停留</div>
+      <div class="loc-value">${typeof t.avgStay === 'number' ? t.avgStay + '晚' : t.avgStay}</div>
+    </div>
+    <div class="loc-item">
+      <div class="loc-label">文旅GDP占比</div>
+      <div class="loc-value">${typeof t.ratio === 'number' ? t.ratio + '%' : t.ratio}</div>
+    </div>
+  `;
+
+  // ④ 资产IP矩阵（表头 + 数据行）
+  const ipScoreColor = s => s >= 80 ? '#059669' : s >= 65 ? '#d97706' : '#dc2626';
+  document.getElementById('ipMatrixWrap').innerHTML = `
+    <div style="display:grid;grid-template-columns:2fr 1.2fr 1.8fr 1.5fr 0.8fr 0.8fr;background:var(--primary);border-radius:8px 8px 0 0;overflow:hidden;">
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;">IP名称</div>
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;border-left:1px solid rgba(255,255,255,0.15);">目标客群</div>
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;border-left:1px solid rgba(255,255,255,0.15);">变现路径</div>
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;border-left:1px solid rgba(255,255,255,0.15);">预期收益</div>
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;border-left:1px solid rgba(255,255,255,0.15);">培育周期</div>
+      <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;border-left:1px solid rgba(255,255,255,0.15);">评分 & 建议</div>
+    </div>
+    ${cul.ipMatrix.map(ip => `
+    <div style="display:grid;grid-template-columns:2fr 1.2fr 1.8fr 1.5fr 0.8fr 0.8fr;border-bottom:1px solid var(--border);background:white;">
+      <div style="padding:10px 12px;font-size:12px;font-weight:600;color:var(--primary);">${ip.name}</div>
+      <div style="padding:10px 12px;font-size:11px;color:var(--text-light);border-left:1px solid var(--border);">${ip.target}</div>
+      <div style="padding:10px 12px;font-size:11px;color:var(--text-light);border-left:1px solid var(--border);">${ip.channel}</div>
+      <div style="padding:10px 12px;font-size:11px;color:var(--text-light);border-left:1px solid var(--border);">${ip.revenue}</div>
+      <div style="padding:10px 12px;font-size:11px;color:var(--text-light);border-left:1px solid var(--border);">${ip.timeline}</div>
+      <div style="padding:10px 12px;border-left:1px solid var(--border);">
+        <div style="font-size:16px;font-weight:700;color:${ipScoreColor(ip.score)}">${ip.score}</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:4px 0;"><div style="height:100%;width:${ip.score}%;background:${ipScoreColor(ip.score)};border-radius:2px;"></div></div>
+        <span class="ip-action-tag ${ip.actionCls}" style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;">${ip.action}</span>
+      </div>
+    </div>
+    `).join('')}
+  `;
+
+  // ⑤ 资产卡片（含IP潜力星级）
+  document.getElementById('cultureGrid').innerHTML = cul.assets.map(a => `
+    <div class="asset-card" style="border-top:3px solid ${a.color}">
+      <span class="asset-level" style="background:${a.color};position:absolute;top:8px;right:8px;font-size:10px;padding:1px 6px;border-radius:4px;color:white;font-weight:600;">${a.level}</span>
+      <h4 style="font-size:13px;font-weight:600;margin-bottom:4px;">${a.title}</h4>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.4;">${a.desc}</p>
+      <div style="display:flex;gap:3px;margin-top:8px;align-items:center;">
+        ${[1,2,3,4,5].map(n => `<span style="width:8px;height:8px;border-radius:50%;background:${n <= a.ipPotential ? '#e8912a' : '#e2e8f0'};"></span>`).join('')}
+        <span style="font-size:10px;color:var(--text-light);margin-left:4px;">IP潜力</span>
+      </div>
+    </div>
+  `).join('');
+
+  // ⑥ 缺口分析
+  document.getElementById('cultureGap').textContent = cul.gap;
+
+  // ⑦ 综合洞察
+  document.getElementById('cultureInsight').textContent = cul.insight;
+
 
   // 区位
   const loc = data.location;
@@ -1464,6 +1803,7 @@ function resetForm() {
   if (gdpChartInstance) { gdpChartInstance.destroy(); gdpChartInstance = null; }
   if (industryChartInstance) { industryChartInstance.destroy(); industryChartInstance = null; }
   if (compChartInstance) { compChartInstance.destroy(); compChartInstance = null; }
+  if (window.cultureGdpChartInst) { window.cultureGdpChartInst.destroy(); window.cultureGdpChartInst = null; }
 
   // 重置评分
   ['policy','economy','population','culture','location'].forEach(k => {
