@@ -1624,9 +1624,13 @@ function animateLoading(callback) {
 }
 
 function generateReport(city, project) {
+  try {
   // 找到匹配城市数据
   const cityKey = Object.keys(CITY_DB).find(k => city.includes(k));
   const data = cityKey ? CITY_DB[cityKey] : DEFAULT_DATA;
+  console.log('[DEBUG] cityKey:', cityKey, '| rating:', data.rating);
+  console.log('[DEBUG] culture.stats:', JSON.stringify(data.culture?.stats));
+  console.log('[DEBUG] policyTools count:', (data.policyTools || []).length);
 
   // 封面
   document.getElementById('coverTitle').textContent = project + ' 项目研判报告';
@@ -1917,6 +1921,13 @@ function generateReport(city, project) {
   // 显示报告
   document.getElementById('report').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(e) {
+    console.error('[generateReport ERROR]:', e.message);
+    console.error(e.stack);
+    document.getElementById('loadingCard').classList.remove('active');
+    document.getElementById('inputSection').style.display = 'block';
+    alert('生成报告时出错: ' + e.message + '\n请按F12打开控制台查看详情');
+  }
 }
 
 function resetForm() {
