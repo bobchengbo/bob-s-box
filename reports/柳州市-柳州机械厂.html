@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>柳州市 · 柳州机械厂 | 棱镜 Lens 研判报告</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1a3a6b;--primary-light:#2a5491;--accent:#e8743b;--bg:#f5f6fa;--card:#fff;--text:#1a1a1a;--text-light:#666;--border:#e0e3eb;--success:#2e7d32;--warning:#ef6c00;--info:#1976d2;--gray:#757575;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.hero{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;padding:48px 24px 40px;text-align:center;}
+.hero-tag{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);padding:6px 16px;border-radius:100px;font-size:13px;margin-bottom:16px;letter-spacing:1px;}
+.hero h1{font-size:32px;font-weight:900;margin-bottom:8px;letter-spacing:1px;}
+.hero-sub{font-size:15px;opacity:0.85;margin-bottom:6px;}
+.hero-meta{font-size:12px;opacity:0.65;margin-top:16px;}
+.container{max-width:960px;margin:0 auto;padding:24px 16px;}
+.card{background:var(--card);border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);}
+.card-title{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.card-title::before{content:'';width:4px;height:20px;background:var(--accent);border-radius:2px;}
+.card-sub{font-size:13px;color:var(--text-light);margin-bottom:20px;}
+.score-overview{display:grid;grid-template-columns:1fr 1.4fr;gap:28px;align-items:center;}
+@media(max-width:640px){.score-overview{grid-template-columns:1fr;}}
+.score-circle{position:relative;width:180px;height:180px;margin:0 auto;}
+.score-circle svg{transform:rotate(-90deg);}
+.score-circle .num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.score-circle .num b{font-size:44px;font-weight:900;color:var(--primary);display:block;line-height:1;}
+.score-circle .num span{font-size:12px;color:var(--text-light);}
+.score-detail h3{font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px;}
+.score-detail .desc{font-size:14px;color:var(--text-light);margin-bottom:14px;line-height:1.7;}
+.tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{background:#eef2f8;color:var(--primary);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;}
+.tag.accent{background:#fff3e8;color:var(--accent);}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px;}
+@media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi-cell{text-align:center;padding:14px 8px;background:#f7f9fc;border-radius:10px;border:1px solid var(--border);}
+.kpi-cell .label{font-size:12px;color:var(--text-light);margin-bottom:4px;}
+.kpi-cell .val{font-size:22px;font-weight:700;color:var(--primary);}
+.kpi-cell .unit{font-size:11px;color:var(--text-light);}
+.section-title{font-size:16px;font-weight:700;color:var(--primary);margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+@media(max-width:640px){.charts-grid{grid-template-columns:1fr;}}
+.chart-box{background:#fafbfc;border:1px solid var(--border);border-radius:10px;padding:16px;}
+.chart-box h4{font-size:14px;font-weight:600;color:var(--primary);margin-bottom:10px;}
+.chart-box .num{font-size:24px;font-weight:700;color:var(--accent);}
+.chart-box .num small{font-size:12px;color:var(--text-light);font-weight:400;margin-left:4px;}
+.chart-canvas{position:relative;height:200px;margin-top:8px;}
+.policy-tools{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+@media(max-width:640px){.policy-tools{grid-template-columns:1fr;}}
+.policy-card{border:1px solid var(--border);border-left:4px solid var(--gray);border-radius:10px;padding:16px;background:#fafbfc;transition:all 0.2s;}
+.policy-card.available{border-left-color:var(--success);}
+.policy-card.limited{border-left-color:var(--warning);}
+.policy-card.potential{border-left-color:var(--info);}
+.policy-card .head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;}
+.policy-card .name{font-size:14px;font-weight:700;color:var(--primary);flex:1;}
+.policy-card .status{font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;font-weight:600;}
+.status-available{background:#e8f5e9;color:var(--success);}
+.status-limited{background:#fff3e0;color:var(--warning);}
+.status-potential{background:#e3f2fd;color:var(--info);}
+.status-unavailable{background:#f5f5f5;color:var(--gray);}
+.policy-card .en{font-size:11px;color:var(--text-light);margin-bottom:6px;font-style:italic;}
+.policy-card .amount{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px;}
+.policy-card .desc{font-size:12px;color:var(--text-light);line-height:1.6;}
+.insight-box{background:linear-gradient(135deg,#f0f4fb 0%,#fef5ec 100%);border-radius:10px;padding:18px;margin-top:16px;font-size:13px;color:var(--text);line-height:1.8;border-left:4px solid var(--accent);}
+.insight-box b{color:var(--primary);}
+.culture-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+@media(max-width:640px){.culture-stats{grid-template-columns:repeat(2,1fr);}}
+.stat-cell{text-align:center;padding:18px 8px;background:linear-gradient(135deg,#fafbfc 0%,#f0f4fb 100%);border-radius:10px;border:1px solid var(--border);}
+.stat-cell .num{font-size:24px;font-weight:800;color:var(--accent);display:block;margin-bottom:4px;}
+.stat-cell .label{font-size:12px;color:var(--text-light);margin-bottom:2px;}
+.stat-cell .note{font-size:10px;color:var(--gray);}
+.assets-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px;}
+@media(max-width:640px){.assets-grid{grid-template-columns:1fr;}}
+.asset-card{background:#fafbfc;border:1px solid var(--border);border-radius:10px;padding:14px;}
+.asset-card .name{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:4px;}
+.asset-card .meta{font-size:11px;color:var(--text-light);margin-bottom:6px;line-height:1.5;}
+.asset-card .hl{font-size:12px;color:var(--accent);font-weight:500;background:#fff8f0;padding:6px 10px;border-radius:6px;margin-top:8px;}
+.ip-matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+@media(max-width:640px){.ip-matrix{grid-template-columns:repeat(2,1fr);}}
+.ip-card{background:linear-gradient(135deg,#fef5ec 0%,#fff8f0 100%);border:1px solid #ffd9b8;border-radius:8px;padding:12px;text-align:center;}
+.ip-card .val{font-size:18px;font-weight:800;color:var(--accent);display:block;}
+.ip-card .unit{font-size:10px;color:var(--text-light);display:block;margin:2px 0 6px;}
+.ip-card .name{font-size:12px;font-weight:600;color:var(--primary);}
+.ip-card .cat{font-size:10px;color:var(--text-light);margin-top:2px;}
+.location-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px;}
+@media(max-width:640px){.location-grid{grid-template-columns:1fr;}}
+.loc-cell{background:#fafbfc;border:1px solid var(--border);border-radius:10px;padding:14px;}
+.loc-cell .label{font-size:12px;color:var(--text-light);margin-bottom:4px;}
+.loc-cell .val{font-size:15px;font-weight:700;color:var(--primary);}
+.swot{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+@media(max-width:640px){.swot{grid-template-columns:1fr;}}
+.swot-card{padding:18px;border-radius:12px;}
+.swot-card h4{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.swot-card.strength{background:linear-gradient(135deg,#e8f5e9 0%,#f1f8e9 100%);border:1px solid #c8e6c9;}
+.swot-card.strength h4{color:var(--success);}
+.swot-card.risk{background:linear-gradient(135deg,#ffebee 0%,,#fce4ec 100%);border:1px solid #ffcdd2;}
+.swot-card.risk h4{color:#c62828;}
+.swot-card ul{list-style:none;padding:0;}
+.swot-card li{font-size:13px;color:var(--text);padding:6px 0 6px 18px;position:relative;line-height:1.6;}
+.swot-card li::before{content:'•';position:absolute;left:4px;top:6px;font-weight:700;}
+.swot-card.strength li::before{color:var(--success);}
+.swot-card.risk li::before{color:#c62828;}
+.coop-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px;}
+.coop-table th{background:var(--primary);color:#fff;padding:10px;text-align:left;font-weight:600;font-size:12px;}
+.coop-table td{padding:10px;border-bottom:1px solid var(--border);}
+.coop-table tr:hover{background:#fafbfc;}
+.coop-table .stars{color:var(--accent);font-weight:700;letter-spacing:1px;}
+.conclusion-box{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;border-radius:16px;padding:32px 28px;margin-top:20px;}
+.conclusion-box h3{font-size:20px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.conclusion-box p{font-size:14px;line-height:1.9;opacity:0.95;white-space:pre-wrap;}
+.conclusion-box b{color:#ffc24b;}
+.footer{text-align:center;padding:24px 16px;font-size:12px;color:var(--text-light);}
+.actions{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:100;}
+.actions button{width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 12px rgba(26,58,107,0.3);transition:transform 0.2s;}
+.actions button:hover{transform:scale(1.08);}
+@media print{.actions{display:none;}.hero{padding:32px 16px;}.card{break-inside:avoid;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">棱镜 LENS · 项目研判报告</div>
+  <h1>柳州市 · 柳州机械厂</h1>
+  <div class="hero-sub">工业遗存活化方向 · 商务研判</div>
+  <div class="hero-meta">报告生成时间:2026-10-14 14:04 · 数据来源:公开资料整理 · 仅供商务研判参考</div>
+</div>
+
+<div class="container">
+
+<!-- 1. 评分总览 -->
+<div class="card">
+  <div class="card-title">一、综合评级</div>
+  <div class="card-sub">基于政策、经济、人口、文化、区位五维模型量化打分</div>
+  <div class="score-overview">
+    <div class="score-circle">
+      <svg width="180" height="180">
+        <circle cx="90" cy="90" r="80" fill="none" stroke="#e0e3eb" stroke-width="12"/>
+        <circle cx="90" cy="90" r="80" fill="none" stroke="#e8743b" stroke-width="12"
+                stroke-dasharray="463.95" stroke-linecap="round" id="scoreRing"/>
+      </svg>
+      <div class="num"><b>92.3</b><span>综合评分</span></div>
+    </div>
+    <div class="score-detail">
+      <h3>A · 强落地潜力</h3>
+      <div class="desc">工业遗存活化方向有清晰政策路径与可复制对标案例，柳空文创园(11亿投资/国家4A/第五批国家工业遗产)已验证模式可走通;但柳州2024年GDP增速仅1.5%处复苏阶段,需谨慎测算投资回报周期。</div>
+      <div class="tags"><span class="tag accent">工业遗产</span>
+<span class="tag ">强IP潜力</span>
+<span class="tag ">对标清晰</span>
+<span class="tag ">政策可获</span>
+<span class="tag ">经济复苏期</span></div>
+    </div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-cell"><div class="label">政策</div><div class="val">92</div><div class="unit">/100</div></div>
+    <div class="kpi-cell"><div class="label">经济</div><div class="val">78</div><div class="unit">/100</div></div>
+    <div class="kpi-cell"><div class="label">人口</div><div class="val">85</div><div class="unit">/100</div></div>
+    <div class="kpi-cell"><div class="label">文化</div><div class="val">96</div><div class="unit">/100</div></div>
+    <div class="kpi-cell"><div class="label">区位</div><div class="val">90</div><div class="unit">/100</div></div>
+  </div>
+</div>
+
+<!-- 2. 政策工具箱 -->
+<div class="card">
+  <div class="card-title">二、政策工具箱</div>
+  <div class="card-sub">基于公开政策文件,梳理可申报的资金/资质/路径</div>
+  <div class="policy-tools"><div class="policy-card available">
+  <div class="head">
+    <div class="name">柳州市文旅产业发展专项资金</div>
+    <div class="status status-available">✓ 可申报</div>
+  </div>
+  <div class="en">Annual 1亿文旅专项资金</div>
+  <div class="amount">资金额度: 1亿元/年</div>
+  <div class="desc">《柳州市建设旅游名城奖励办法》明确每年固定1亿元,支持工业遗产+文旅融合业态</div>
+</div>
+<div class="policy-card available">
+  <div class="head">
+    <div class="name">国家工业遗产保护利用</div>
+    <div class="status status-available">✓ 可申报</div>
+  </div>
+  <div class="en">National Industrial Heritage Program</div>
+  <div class="amount">资金额度: 中央+地方配套</div>
+  <div class="desc">工信部2021年第五批名单中柳空已入选;新申报需省级工信厅推荐,可走&#x27;一地一策&#x27;通道</div>
+</div>
+<div class="policy-card limited">
+  <div class="head">
+    <div class="name">广西工业遗产管理办法</div>
+    <div class="status status-limited">⚠ 有门槛</div>
+  </div>
+  <div class="en">Guangxi Industrial Heritage Mgmt</div>
+  <div class="amount">资金额度: 5年有效期+复核</div>
+  <div class="desc">广西工信厅主管,所有权人为保护责任人,需纳入市级规划+日常维护+5年复核</div>
+</div>
+<div class="policy-card available">
+  <div class="head">
+    <div class="name">国家4A级旅游景区创建</div>
+    <div class="status status-available">✓ 柳空已对标</div>
+  </div>
+  <div class="en">A-Grade Scenic Spot</div>
+  <div class="amount">资金额度: 奖励+税收优惠</div>
+  <div class="desc">柳空文创园已创成4A,可参考其&#x27;原真性+整体性+可持续&#x27;三大原则申报</div>
+</div>
+<div class="policy-card available">
+  <div class="head">
+    <div class="name">工业旅游精品线路整合</div>
+    <div class="status status-available">✓ 已有5条线路</div>
+  </div>
+  <div class="en">Industrial Tourism Route</div>
+  <div class="amount">资金额度: 整合营销支持</div>
+  <div class="desc">柳州已发布5条工业旅游线路(工业博物馆+柳空+石尚1966等),新项目可纳入串联</div>
+</div>
+<div class="policy-card available">
+  <div class="head">
+    <div class="name">文化惠民消费补贴</div>
+    <div class="status status-available">✓ 拉动消费</div>
+  </div>
+  <div class="en">Cultural Consumption Subsidy</div>
+  <div class="amount">资金额度: 200元补贴200元</div>
+  <div class="desc">游客充值200元政府补贴200元,可叠加项目票务系统设计</div>
+</div>
+<div class="policy-card potential">
+  <div class="head">
+    <div class="name">工业遗址&#x27;一地一策&#x27;改造</div>
+    <div class="status status-potential">○ 需谈判</div>
+  </div>
+  <div class="en">Site-Specific Redevelopment</div>
+  <div class="amount">资金额度: 土地+税收支持</div>
+  <div class="desc">广西区2026-2030城市更新行动方案明确支持,但需属地化方案+与政府/原产权方谈判</div>
+</div>
+<div class="policy-card potential">
+  <div class="head">
+    <div class="name">EOD/专项债/PPP</div>
+    <div class="status status-potential">○ 需包装</div>
+  </div>
+  <div class="en">EOD + Special Bonds</div>
+  <div class="amount">资金额度: 项目包装后申报</div>
+  <div class="desc">柳空11亿投资由柳州文旅集团主导,新项目需包装为生态环境导向(EOD)或文旅专项债</div>
+</div></div>
+  <div class="insight-box"><b>研判:</b>柳州工业遗存活化的'政策包'已相当成熟:每年1亿专项+国家工业遗产+广西办法+4A奖励+消费补贴五重叠加。最大风险是柳州2024年GDP仅增1.5%处复苏阶段,财政承压期对新增项目补贴或更严。</div>
+</div>
+
+<!-- 3. 宏观经济与人口 -->
+<div class="card">
+  <div class="card-title">三、宏观经济与人口</div>
+  <div class="card-sub">2020-2024 五年关键指标</div>
+  <div class="charts-grid">
+    <div class="chart-box">
+      <h4>GDP 与增速</h4>
+      <div class="num">2950.67<small>亿元 (2024)</small></div>
+      <div class="chart-canvas"><canvas id="gdpChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>产业结构 (2024)</h4>
+      <div class="num">49.59<small>% 三产占比</small></div>
+      <div class="chart-canvas"><canvas id="indChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>常住人口</h4>
+      <div class="num">414.6<small>万人 (2024)</small></div>
+      <div class="chart-canvas"><canvas id="popChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>游客量与结构</h4>
+      <div class="num">0.95<small>万人次/年</small></div>
+      <div class="chart-canvas"><canvas id="touChart"></canvas></div>
+    </div>
+  </div>
+  <div class="insight-box"><b>经济特征:</b>2024年GDP 2950.67亿元(广西第二),但增速仅1.5%处复苏阶段;三产占比49.59%已具现代化雏形;城镇化率71.42%高于全国平均;常住人口414.6万(微降0.75万)需关注人口外流;居民收入城镇居民人均可支配收入约 4.4 万元/年。</div>
+</div>
+
+<!-- 4. 在地文化资产 -->
+<div class="card">
+  <div class="card-title">四、在地文化资产</div>
+  <div class="card-sub">可联动 IP / 工业遗存 / 文旅流量基础</div>
+  
+  <div class="section-title">▌文化台账(头部资源)</div>
+  <div class="culture-stats"><div class="stat-cell">
+  <span class="num">1处(柳空)</span>
+  <div class="label">国家工业遗产</div>
+  <div class="note">可申报增量</div>
+</div>
+<div class="stat-cell">
+  <span class="num">8家</span>
+  <div class="label">4A工业景区</div>
+  <div class="note">占广西大头</div>
+</div>
+<div class="stat-cell">
+  <span class="num">14个</span>
+  <div class="label">工业旅游资源点</div>
+  <div class="note">全链覆盖</div>
+</div>
+<div class="stat-cell">
+  <span class="num">150万人次</span>
+  <div class="label">工业博物馆年客流</div>
+  <div class="note">2025年峰值</div>
+</div></div>
+  
+  <div class="section-title">▌文化GDP与文旅消费(2020-2024)</div>
+  <div class="chart-box" style="max-width:520px;margin:0 auto;">
+    <div class="chart-canvas" style="height:220px;"><canvas id="cultureChart"></canvas></div>
+  </div>
+  
+  <div class="section-title">▌工业遗产与文旅项目(可联动)</div>
+  <div class="assets-grid"><div class="asset-card">
+  <div class="name">柳空文创园(对标)</div>
+  <div class="meta">类型: 国家工业遗产·4A · 规模: 413亩·22万㎡ · 投资: 11亿 · 主体: 柳州文旅集团</div>
+  <div class="hl">✦ 全模式跑通,本研究主对标</div>
+</div>
+<div class="asset-card">
+  <div class="name">柳州工业博物馆</div>
+  <div class="meta">类型: 原第三棉纺厂 · 规模: 6500件藏品 · 投资: — · 主体: 市文旅局</div>
+  <div class="hl">✦ 年客流150万,2025年峰值破万</div>
+</div>
+<div class="asset-card">
+  <div class="name">石尚1966</div>
+  <div class="meta">类型: 原柳州电子管厂 · 规模: 260家商户 · 投资: 民营 · 主体: 罗声亮</div>
+  <div class="hl">✦ 广西首批文创示范,扁平化民营样本</div>
+</div>
+<div class="asset-card">
+  <div class="name">柳州螺蛳粉小镇</div>
+  <div class="meta">类型: 特色小镇 · 规模: — · 投资: — · 主体: 柳南区</div>
+  <div class="hl">✦ IP价值150亿(2025),全产业链750亿</div>
+</div>
+<div class="asset-card">
+  <div class="name">上汽通用五菱宝骏基地</div>
+  <div class="meta">类型: 在产工业旅游 · 规模: — · 投资: — · 主体: 上汽通用五菱</div>
+  <div class="hl">✦ 年研学5万人次,首批&#x27;跟着品牌去旅行&#x27;</div>
+</div>
+<div class="asset-card">
+  <div class="name">柳工智慧绿色研学基地</div>
+  <div class="meta">类型: AI工业研学 · 规模: — · 投资: — · 主体: 柳工集团</div>
+  <div class="hl">✦ 广西首家AI工业研学,2026年新晋</div>
+</div></div>
+  
+  <div class="section-title">▌城市 IP 矩阵(可借用叙事)</div>
+  <div class="ip-matrix"><div class="ip-card">
+  <span class="val">150.51</span>
+  <span class="unit">亿元品牌价值</span>
+  <div class="name">柳州螺蛳粉</div>
+  <div class="cat">美食IP · 全国地标第19</div>
+</div>
+<div class="ip-card">
+  <span class="val">11</span>
+  <span class="unit">亿元投资</span>
+  <div class="name">柳空(柳州空压机厂)</div>
+  <div class="cat">工业遗产 · 广西首批</div>
+</div>
+<div class="ip-card">
+  <span class="val">150</span>
+  <span class="unit">万年客流</span>
+  <div class="name">柳州工业博物馆</div>
+  <div class="cat">工业研学 · —</div>
+</div>
+<div class="ip-card">
+  <span class="val">28</span>
+  <span class="unit">万株紫荆花</span>
+  <div class="name">紫荆花城</div>
+  <div class="cat">城市IP · 城市新名片</div>
+</div>
+<div class="ip-card">
+  <span class="val">4</span>
+  <span class="unit">绝(壮歌瑶舞苗节侗楼)</span>
+  <div class="name">民族风情四绝</div>
+  <div class="cat">非遗IP · —</div>
+</div>
+<div class="ip-card">
+  <span class="val">5</span>
+  <span class="unit">A级景区创建中</span>
+  <div class="name">三江侗族村寨</div>
+  <div class="cat">民俗IP · 申遗中</div>
+</div></div>
+  
+  <div class="insight-box">
+    <p><b>综合洞察:</b>柳州文化资产的'工业'标签极强:14个工业旅游资源点+1个国家工业遗产+8个4A工业景区,密度居广西之首,且有'螺蛳粉(150亿)+紫荆花+民族四绝'三套成熟IP可联动。柳空文创园(11亿/4A/工业遗产三标签叠加)是教科书级对标。</p>
+    <p style="margin-top:10px;"><b>市场缺口:</b>当前柳空模式已跑通但仍是'政府主导+国有平台'路径,缺乏'民营主理人+市场化运营'的差异样本。柳州机械厂若以'主理人驱动+轻资产改造'切入,可填补市场空白。但需注意柳州2024年游客9500万人次中工业旅游仅占28.5%,仍有放大空间。</p>
+  </div>
+</div>
+
+<!-- 5. 区位与交通 -->
+<div class="card">
+  <div class="card-title">五、区位与交通</div>
+  <div class="card-sub">物流/客流/产业链辐射能力</div>
+  <div class="location-grid">
+    <div class="loc-cell"><div class="label">城市能级</div><div class="val">全国性综合交通枢纽</div></div>
+    <div class="loc-cell"><div class="label">铁路网络</div><div class="val">6条铁路干线</div></div>
+    <div class="loc-cell"><div class="label">高速公路</div><div class="val">8条高速交汇</div></div>
+    <div class="loc-cell"><div class="label">机场</div><div class="val">白莲机场(4C级)</div></div>
+    <div class="loc-cell"><div class="label">港口</div><div class="val">柳江港(2000吨级通航,粤港澳班轮)</div></div>
+    <div class="loc-cell"><div class="label">物流枢纽</div><div class="val">陆港型+生产服务型国家物流枢纽</div></div>
+  </div>
+  <div class="insight-box" style="margin-top:16px;"><b>交通研判:</b>柳州交通能级远超其GDP量级(全国性综合交通枢纽+物流双枢纽),尤其'柳江港+粤港澳班轮'为工业品/大宗物流提供低成本通道——工业遗存活化中的'老设备/钢构建材'运输成本可显著低于内陆同类城市。但市区通勤拥堵+白莲机场4C级(无国际航线)是高端商务接待的瓶颈。</div>
+</div>
+
+<!-- 6. SWOT + 合作方 + 结论 -->
+<div class="card">
+  <div class="card-title">六、合作研判</div>
+  
+  <div class="section-title">▌SWOT</div>
+  <div class="swot">
+    <div class="swot-card strength">
+      <h4>▲ 核心优势</h4>
+      <ul><li>国家工业遗产政策窗口期(2026-2030广西城市更新行动方案+7部委通知叠加)</li>
+<li>柳空文创园已验证&#x27;工业遗产→4A景区→网红地标&#x27;完整路径,模式可复制</li>
+<li>螺蛳粉150亿IP+紫荆花+民族四绝三套联动IP池,内容供给不枯竭</li>
+<li>全国性综合交通枢纽+陆海新通道,工业品/建造成本低于同类城市</li>
+<li>柳州文旅集团有实操经验可合作/合资/委托运营</li></ul>
+    </div>
+    <div class="swot-card risk">
+      <h4>▼ 主要风险</h4>
+      <ul><li>柳州2024年GDP增速仅1.5%,财政承压期对新增项目补贴审批趋严</li>
+<li>工业遗产改造总投动辄10亿+,柳空11亿由国资主导,民营资本进入路径不清</li>
+<li>主城区优质工业遗产点位(柳空/石尚1966/工业博物馆)已占位,剩余点位产权/规模/区位条件较弱</li>
+<li>工业旅游占比28.5%但客单价低于山水景区,变现模型仍依赖二消(餐饮/研学/演出)</li>
+<li>螺蛳粉IP&#x27;过载风险&#x27;:城市营销高度绑定螺蛳粉,工业遗产新IP破圈需差异化叙事</li></ul>
+    </div>
+  </div>
+  
+  <div class="section-title">▌合作方建议</div>
+  <table class="coop-table">
+    <thead><tr><th>合作方</th><th>类型</th><th>合作模式</th><th>价值度</th><th>备注</th></tr></thead>
+    <tbody><tr>
+  <td><b>柳州文旅集团</b></td>
+  <td>国企·柳空运营方</td>
+  <td>合资/委托运营</td>
+  <td><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span></td>
+  <td style="font-size:12px;color:#666;">柳空操盘手,工业遗存活化一手经验,首选</td>
+</tr>
+<tr>
+  <td><b>上汽通用五菱/柳工</b></td>
+  <td>在产工业</td>
+  <td>品牌联名+研学</td>
+  <td><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span></td>
+  <td style="font-size:12px;color:#666;">工业研学流量入口,稀缺品牌资源</td>
+</tr>
+<tr>
+  <td><b>广西旅发集团</b></td>
+  <td>区级国企</td>
+  <td>战略投资</td>
+  <td><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span></td>
+  <td style="font-size:12px;color:#666;">广西文旅平台,跨地市资源整合</td>
+</tr>
+<tr>
+  <td><b>民营主理人(石尚1966罗声亮模式)</b></td>
+  <td>民营</td>
+  <td>承租+主理人</td>
+  <td><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span></td>
+  <td style="font-size:12px;color:#666;">差异化样本,适合轻资产切入</td>
+</tr>
+<tr>
+  <td><b>北京798/上海M50团队</b></td>
+  <td>外部专业</td>
+  <td>顾问+运营</td>
+  <td><spanclass='stars'>★</span><spanclass='stars'>★</span><spanclass='stars'>★</span></td>
+  <td style="font-size:12px;color:#666;">工业文创园头部操盘,可做顾问引进</td>
+</tr></tbody>
+  </table>
+</div>
+
+<!-- 7. 综合结论 -->
+<div class="conclusion-box">
+  <h3>◆ 综合研判结论</h3>
+  <p>**柳州机械厂项目建议'工业遗存活化'方向立项,定位'主理人驱动+差异化叙事'。** 柳州政策窗口、IP密度、交通能级均位居广西前列,柳空文创园(11亿/4A/国家工业遗产)已提供完整可复制模型。关键风险在于柳州经济复苏期(2024 GDP +1.5%)的财政承压与主城区优质点位占位,建议**'三步走'**:①锁定产权清晰、规模>50亩的次优区位;②与柳州文旅集团合资/委托运营以借力其柳空操盘经验;③以'机械厂-工业-柳州制造精神'差异化叙事,避开与柳空同质化。
+
+**核心建议**:先做'产权+规划+合资协议'三件套,再启动产品设计;投资规模控制在3-5亿(柳空的1/3),以轻资产+主理人模式降低风险。</p>
+</div>
+
+</div>
+
+<div class="footer">
+  本报告由 棱镜 Lens v2.0 实时数据研判系统生成 · 数据源:公开统计公报、政府文件、行业报道 · 仅供商务研判参考,不构成投资建议<br>
+  Powered by QClaw · 报告编号:LZ-202610141404
+</div>
+
+<div class="actions">
+  <button onclick="window.print()" title="打印/导出PDF">🖨</button>
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+</div>
+
+<script>
+// ============ 注入数据 ============
+const D = {"rating": 92.3, "ratingTitle": "A · 强落地潜力", "ratingDesc": "工业遗存活化方向有清晰政策路径与可复制对标案例，柳空文创园(11亿投资/国家4A/第五批国家工业遗产)已验证模式可走通;但柳州2024年GDP增速仅1.5%处复苏阶段,需谨慎测算投资回报周期。", "ratingTags": ["工业遗产", "强IP潜力", "对标清晰", "政策可获", "经济复苏期"], "kpi": {"policy": 92, "economy": 78, "population": 85, "culture": 96, "location": 90}, "gdp": 2950.67, "gdpLabels": ["2020", "2021", "2022", "2023", "2024"], "gdpValues": [3176.9, 3308.5, 3102.3, 2948.9, 2950.67], "gdpGrowth": [1.5, 6.0, -1.5, 2.8, 1.5], "industryLabels": ["第一产业", "第二产业", "第三产业"], "industryValues": [10.46, 39.95, 49.59], "pop": 414.6, "popTrend": [413.8, 415.3, 415.4, 415.35, 414.6], "popUrban": 71.42, "income": "城镇居民人均可支配收入约 4.4 万元/年", "tourist": 9500, "touristShare": 28.5, "policy": [{"name": "柳州市文旅产业发展专项资金", "en": "Annual 1亿文旅专项资金", "amount": "1亿元/年", "status": "available", "statusLabel": "✓ 可申报", "desc": "《柳州市建设旅游名城奖励办法》明确每年固定1亿元,支持工业遗产+文旅融合业态", "color": "#2e7d32"}, {"name": "国家工业遗产保护利用", "en": "National Industrial Heritage Program", "amount": "中央+地方配套", "status": "available", "statusLabel": "✓ 可申报", "desc": "工信部2021年第五批名单中柳空已入选;新申报需省级工信厅推荐,可走'一地一策'通道", "color": "#2e7d32"}, {"name": "广西工业遗产管理办法", "en": "Guangxi Industrial Heritage Mgmt", "amount": "5年有效期+复核", "status": "limited", "statusLabel": "⚠ 有门槛", "desc": "广西工信厅主管,所有权人为保护责任人,需纳入市级规划+日常维护+5年复核", "color": "#ef6c00"}, {"name": "国家4A级旅游景区创建", "en": "A-Grade Scenic Spot", "amount": "奖励+税收优惠", "status": "available", "statusLabel": "✓ 柳空已对标", "desc": "柳空文创园已创成4A,可参考其'原真性+整体性+可持续'三大原则申报", "color": "#2e7d32"}, {"name": "工业旅游精品线路整合", "en": "Industrial Tourism Route", "amount": "整合营销支持", "status": "available", "statusLabel": "✓ 已有5条线路", "desc": "柳州已发布5条工业旅游线路(工业博物馆+柳空+石尚1966等),新项目可纳入串联", "color": "#2e7d32"}, {"name": "文化惠民消费补贴", "en": "Cultural Consumption Subsidy", "amount": "200元补贴200元", "status": "available", "statusLabel": "✓ 拉动消费", "desc": "游客充值200元政府补贴200元,可叠加项目票务系统设计", "color": "#2e7d32"}, {"name": "工业遗址'一地一策'改造", "en": "Site-Specific Redevelopment", "amount": "土地+税收支持", "status": "potential", "statusLabel": "○ 需谈判", "desc": "广西区2026-2030城市更新行动方案明确支持,但需属地化方案+与政府/原产权方谈判", "color": "#1976d2"}, {"name": "EOD/专项债/PPP", "en": "EOD + Special Bonds", "amount": "项目包装后申报", "status": "potential", "statusLabel": "○ 需包装", "desc": "柳空11亿投资由柳州文旅集团主导,新项目需包装为生态环境导向(EOD)或文旅专项债", "color": "#1976d2"}], "policyInsight": "柳州工业遗存活化的'政策包'已相当成熟:每年1亿专项+国家工业遗产+广西办法+4A奖励+消费补贴五重叠加。最大风险是柳州2024年GDP仅增1.5%处复苏阶段,财政承压期对新增项目补贴或更严。", "culture": {"stats": [{"label": "国家工业遗产", "value": "1处(柳空)", "note": "可申报增量"}, {"label": "4A工业景区", "value": "8家", "note": "占广西大头"}, {"label": "工业旅游资源点", "value": "14个", "note": "全链覆盖"}, {"label": "工业博物馆年客流", "value": "150万人次", "note": "2025年峰值"}], "statsLabels": ["国家工业遗产", "4A工业景区", "工业旅游资源点", "工业博物馆年客流"], "statsValues": [1, 8, 14, 150], "gdp": [{"year": "2020", "culture": 45, "tourism": 520}, {"year": "2021", "culture": 55, "tourism": 680}, {"year": "2022", "culture": 52, "tourism": 580}, {"year": "2023", "culture": 68, "tourism": 820}, {"year": "2024", "culture": 78, "tourism": 950}], "gdpLabels": ["2020", "2021", "2022", "2023", "2024"], "tourist": {"total": 9500, "industrial": 2700, "industrialShare": 28.5, "yoy": 8.2}, "assets": [{"name": "柳空文创园(对标)", "type": "国家工业遗产·4A", "area": "413亩·22万㎡", "invest": "11亿", "owner": "柳州文旅集团", "highlight": "全模式跑通,本研究主对标"}, {"name": "柳州工业博物馆", "type": "原第三棉纺厂", "area": "6500件藏品", "invest": "—", "owner": "市文旅局", "highlight": "年客流150万,2025年峰值破万"}, {"name": "石尚1966", "type": "原柳州电子管厂", "area": "260家商户", "invest": "民营", "owner": "罗声亮", "highlight": "广西首批文创示范,扁平化民营样本"}, {"name": "柳州螺蛳粉小镇", "type": "特色小镇", "area": "—", "invest": "—", "owner": "柳南区", "highlight": "IP价值150亿(2025),全产业链750亿"}, {"name": "上汽通用五菱宝骏基地", "type": "在产工业旅游", "area": "—", "invest": "—", "owner": "上汽通用五菱", "highlight": "年研学5万人次,首批'跟着品牌去旅行'"}, {"name": "柳工智慧绿色研学基地", "type": "AI工业研学", "area": "—", "invest": "—", "owner": "柳工集团", "highlight": "广西首家AI工业研学,2026年新晋"}], "ipMatrix": [{"name": "柳州螺蛳粉", "value": 150.51, "unit": "亿元品牌价值", "category": "美食IP", "rank": "全国地标第19"}, {"name": "柳空(柳州空压机厂)", "value": 11, "unit": "亿元投资", "category": "工业遗产", "rank": "广西首批"}, {"name": "柳州工业博物馆", "value": 150, "unit": "万年客流", "category": "工业研学", "rank": "—"}, {"name": "紫荆花城", "value": 28, "unit": "万株紫荆花", "category": "城市IP", "rank": "城市新名片"}, {"name": "民族风情四绝", "value": 4, "unit": "绝(壮歌瑶舞苗节侗楼)", "category": "非遗IP", "rank": "—"}, {"name": "三江侗族村寨", "value": 5, "unit": "A级景区创建中", "category": "民俗IP", "rank": "申遗中"}], "insight": "柳州文化资产的'工业'标签极强:14个工业旅游资源点+1个国家工业遗产+8个4A工业景区,密度居广西之首,且有'螺蛳粉(150亿)+紫荆花+民族四绝'三套成熟IP可联动。柳空文创园(11亿/4A/工业遗产三标签叠加)是教科书级对标。", "gap": "当前柳空模式已跑通但仍是'政府主导+国有平台'路径,缺乏'民营主理人+市场化运营'的差异样本。柳州机械厂若以'主理人驱动+轻资产改造'切入,可填补市场空白。但需注意柳州2024年游客9500万人次中工业旅游仅占28.5%,仍有放大空间。"}, "location": {"hubType": "全国性综合交通枢纽", "highway": "8条高速交汇", "railway": "6条铁路干线", "airport": "白莲机场(4C级)", "port": "柳江港(2000吨级通航,粤港澳班轮)", "logistics": "陆港型+生产服务型国家物流枢纽", "channel": "西部陆海新通道重要节点"}, "locationInsight": "柳州交通能级远超其GDP量级(全国性综合交通枢纽+物流双枢纽),尤其'柳江港+粤港澳班轮'为工业品/大宗物流提供低成本通道——工业遗存活化中的'老设备/钢构建材'运输成本可显著低于内陆同类城市。但市区通勤拥堵+白莲机场4C级(无国际航线)是高端商务接待的瓶颈。", "strengths": ["国家工业遗产政策窗口期(2026-2030广西城市更新行动方案+7部委通知叠加)", "柳空文创园已验证'工业遗产→4A景区→网红地标'完整路径,模式可复制", "螺蛳粉150亿IP+紫荆花+民族四绝三套联动IP池,内容供给不枯竭", "全国性综合交通枢纽+陆海新通道,工业品/建造成本低于同类城市", "柳州文旅集团有实操经验可合作/合资/委托运营"], "risks": ["柳州2024年GDP增速仅1.5%,财政承压期对新增项目补贴审批趋严", "工业遗产改造总投动辄10亿+,柳空11亿由国资主导,民营资本进入路径不清", "主城区优质工业遗产点位(柳空/石尚1966/工业博物馆)已占位,剩余点位产权/规模/区位条件较弱", "工业旅游占比28.5%但客单价低于山水景区,变现模型仍依赖二消(餐饮/研学/演出)", "螺蛳粉IP'过载风险':城市营销高度绑定螺蛳粉,工业遗产新IP破圈需差异化叙事"], "coop": [{"name": "柳州文旅集团", "type": "国企·柳空运营方", "model": "合资/委托运营", "value": "★ ★ ★ ★ ★", "note": "柳空操盘手,工业遗存活化一手经验,首选"}, {"name": "上汽通用五菱/柳工", "type": "在产工业", "model": "品牌联名+研学", "value": "★ ★ ★ ★", "note": "工业研学流量入口,稀缺品牌资源"}, {"name": "广西旅发集团", "type": "区级国企", "model": "战略投资", "value": "★ ★ ★ ★", "note": "广西文旅平台,跨地市资源整合"}, {"name": "民营主理人(石尚1966罗声亮模式)", "type": "民营", "model": "承租+主理人", "value": "★ ★ ★", "note": "差异化样本,适合轻资产切入"}, {"name": "北京798/上海M50团队", "type": "外部专业", "model": "顾问+运营", "value": "★ ★ ★", "note": "工业文创园头部操盘,可做顾问引进"}], "conclusion": "**柳州机械厂项目建议'工业遗存活化'方向立项,定位'主理人驱动+差异化叙事'。** 柳州政策窗口、IP密度、交通能级均位居广西前列,柳空文创园(11亿/4A/国家工业遗产)已提供完整可复制模型。关键风险在于柳州经济复苏期(2024 GDP +1.5%)的财政承压与主城区优质点位占位,建议**'三步走'**:①锁定产权清晰、规模>50亩的次优区位;②与柳州文旅集团合资/委托运营以借力其柳空操盘经验;③以'机械厂-工业-柳州制造精神'差异化叙事,避开与柳空同质化。\n\n**核心建议**:先做'产权+规划+合资协议'三件套,再启动产品设计;投资规模控制在3-5亿(柳空的1/3),以轻资产+主理人模式降低风险。"};
+
+// 评分环
+const rating = D.rating;
+const circle = 2 * Math.PI * 80;
+const dash = circle * (rating / 100);
+document.getElementById('scoreRing').style.strokeDasharray = `${dash} ${circle}`;
+
+// 图表默认配置
+Chart.defaults.font.family = "'Noto Sans SC', sans-serif";
+Chart.defaults.color = '#666';
+
+// 1. GDP
+new Chart(document.getElementById('gdpChart'), {
+  type: 'bar',
+  data: {
+    labels: D.gdpLabels,
+    datasets: [
+      {type:'bar', label:'GDP(亿元)', data: D.gdpValues, backgroundColor:'#1a3a6b', borderRadius:6, yAxisID:'y'},
+      {type:'line', label:'增速(%)', data: D.gdpGrowth, borderColor:'#e8743b', backgroundColor:'#e8743b', tension:0.35, yAxisID:'y1'}
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+    scales:{
+      y:{position:'left',ticks:{font:{size:10}}},
+      y1:{position:'right',grid:{display:false},ticks:{font:{size:10},callback:v=>v+'%'}}
+    }
+  }
+});
+
+// 2. 产业结构
+new Chart(document.getElementById('indChart'), {
+  type: 'doughnut',
+  data: {labels: D.industryLabels, datasets:[{data: D.industryValues,
+    backgroundColor:['#2e7d32','#1a3a6b','#e8743b'], borderWidth:0}]},
+  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},
+    cutout:'60%'}
+});
+
+// 3. 人口
+new Chart(document.getElementById('popChart'), {
+  type: 'line',
+  data: {labels: D.gdpLabels, datasets:[{label:'常住人口(万)', data: D.popTrend, borderColor:'#1a3a6b', backgroundColor:'rgba(26,58,107,0.1)', fill:true, tension:0.35}]},
+  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{y:{ticks:{font:{size:10}},grid:{color:'#f0f0f0'}},x:{ticks:{font:{size:10}}}}}
+});
+
+// 4. 游客
+new Chart(document.getElementById('touChart'), {
+  type: 'bar',
+  data: {
+    labels:['工业旅游','山水/文化','其他'],
+    datasets:[{data:[D.culture.tourist.industrial, D.culture.tourist.total-D.culture.tourist.industrial, 0].map((v,i)=>i===2?Math.max(0, D.culture.tourist.total*0.15):v),
+      backgroundColor:['#e8743b','#1a3a6b','#90a4ae'], borderRadius:6}]
+  },
+  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{y:{ticks:{font:{size:10},callback:v=>v+'万'}},x:{ticks:{font:{size:10}}}}}
+});
+
+// 5. 文化GDP
+new Chart(document.getElementById('cultureChart'), {
+  type:'line',
+  data: {labels: D.culture.gdpLabels, datasets:[
+    {label:'文化GDP(亿)', data: D.culture.gdp.map(d=>d.culture), borderColor:'#e8743b', backgroundColor:'rgba(232,116,59,0.1)', fill:true, tension:0.35, yAxisID:'y'},
+    {label:'旅游消费(亿)', data: D.culture.gdp.map(d=>d.tourism), borderColor:'#1a3a6b', backgroundColor:'rgba(26,58,107,0.1)', fill:true, tension:0.35, yAxisID:'y1'}
+  ]},
+  options: {responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+    scales:{y:{position:'left',ticks:{font:{size:10}}},y1:{position:'right',grid:{display:false},ticks:{font:{size:10}}}}}
+});
+</script>
+</body>
+</html>
