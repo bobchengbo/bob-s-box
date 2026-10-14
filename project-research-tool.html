@@ -953,6 +953,11 @@
     .container { max-width: 100%; margin: 0; padding: 0; }
     .card { break-inside: avoid; box-shadow: none; border: 1px solid #e2e8f0; }
   }
+  .import-divider{display:flex;align-items:center;gap:12px;margin:20px 0 10px;color:var(--text-light);font-size:13px;font-weight:500;}
+  .import-divider::before,.import-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .import-box{background:#f0f4fb;border:1px dashed #b8c4d8;border-radius:10px;padding:16px;margin-bottom:8px;}
+  .import-textarea{width:100%;height:96px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;margin:12px 0;box-sizing:border-box;}
+  .import-textarea:focus{outline:none;border-color:var(--primary-light);}
 </style>
 </head>
 <body>
@@ -961,7 +966,7 @@
 <div class="header">
   <h1>项目研判报告工具</h1>
   <p>全资产运营服务商 · 商务研判专用</p>
-  <span class="header-badge">棱镜 Lens · v1.0</span>
+  <span class="header-badge">棱镜 Lens · v2.0</span>
 </div>
 
 <!-- 主容器 -->
@@ -1018,6 +1023,23 @@
         <input type="text" id="projScale" placeholder="如：占地约200亩，投资约3亿元" />
       </div>
     </div>
+    <div class="import-divider"><span>或粘贴 AI 实时研判数据</span></div>
+    <div class="import-box">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>城市（可选，留空则用数据内值）</label>
+          <input type="text" id="importCity" placeholder="如：临沂市" />
+        </div>
+        <div class="form-group">
+          <label>项目（可选）</label>
+          <input type="text" id="importProject" placeholder="如：王羲之故居片区" />
+        </div>
+      </div>
+      <textarea id="importData" class="import-textarea" placeholder="将 AI 助手联网抓取后生成的研判数据 JSON 粘贴到这里…"></textarea>
+      <button class="btn-secondary" onclick="importAI()">📥 渲染 AI 数据报告</button>
+      <div class="form-hint">未收录城市：让 AI 助手联网抓取后，把数据 JSON 粘贴到此渲染即可获得同等深度报告。</div>
+    </div>
+
     <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">
       🔍 开始研判分析
     </button>
@@ -1055,7 +1077,7 @@
       <div class="cover-meta">
         <span>📅 <span id="coverDate"></span></span>
         <span>🏢 全资产运营服务商</span>
-        <span>🤖 棱镜 Lens 研判系统 v1.2（文化深度版）</span>
+        <span>🤖 棱镜 Lens 研判系统 v2.0（实时数据版）</span>
       </div>
     </div>
 
@@ -1492,8 +1514,7 @@ const CITY_DB = {
       { icon: '🏘️', name: '运营托管', desc: '已有运营资产的项目可以探索', score: '可探索', cls: 'score-mid' },
     ],
     conclusion: '安庆是"潜力型"市场，核心优势是黄梅戏和长江文化，短板是IP化程度和城市竞争力。建议以策划方案作为敲门砖，用"皖江文化复兴"叙事打动政府，先锁定一个小型项目验证能力，再逐步扩大合作范围。'
-  }
-};
+  },
   '北京': {
     gdp: [36103, 40269, 41610, 43742, 45600],
     gdpLabels: ['2020','2021','2022','2023','2024'],
@@ -2029,6 +2050,7 @@ const CITY_DB = {
     ],
     conclusion: '苏州的核心是「精致」而非「规模」——进入苏州市场，要用「精致」对标「精致」，用「江南生活美学运营商」而非「文旅开发商」的身份切入。苏州的机会在于把「白天商务+晚上文化」的双核联动打通，以及把平江路的有机更新模式复制到更多存量项目中。'
   },
+};
 
 
 // 默认数据（未知城市使用）
@@ -2160,14 +2182,14 @@ function animateLoading(callback) {
 }
 
 function generateReport(city, project) {
-  try {
-  // 找到匹配城市数据
   const cityKey = Object.keys(CITY_DB).find(k => city.includes(k));
   const data = cityKey ? CITY_DB[cityKey] : DEFAULT_DATA;
-  console.log('[DEBUG] cityKey:', cityKey, '| rating:', data.rating);
-  console.log('[DEBUG] culture.stats:', JSON.stringify(data.culture?.stats));
-  console.log('[DEBUG] policyTools count:', (data.policyTools || []).length);
+  render(data, city, project);
+}
 
+function render(data, city, project) {
+  try {
+  if (!data || !data.kpi || !data.culture) { alert('数据格式不正确：缺少 kpi / culture 等必要字段，请确认粘贴的是完整研判数据 JSON'); return; }
   // 封面
   document.getElementById('coverTitle').textContent = project + ' 项目研判报告';
   document.getElementById('coverCity').textContent = '📍 ' + city;
@@ -2458,12 +2480,22 @@ function generateReport(city, project) {
   document.getElementById('report').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch(e) {
-    console.error('[generateReport ERROR]:', e.message);
-    console.error(e.stack);
-    document.getElementById('loadingCard').classList.remove('active');
-    document.getElementById('inputSection').style.display = 'block';
-    alert('生成报告时出错: ' + e.message + '\n请按F12打开控制台查看详情');
+    console.error('[render ERROR]:', e.message);
+    alert('生成报告时出错: ' + e.message);
   }
+}
+
+function importAI() {
+  const raw = document.getElementById('importData').value.trim();
+  if (!raw) { alert('请先粘贴 AI 生成的研判数据 JSON'); return; }
+  let data;
+  try { data = JSON.parse(raw); } catch(err) { alert('JSON 解析失败：' + err.message); return; }
+  const city = (document.getElementById('importCity').value.trim()) || data.city || '未知城市';
+  const project = (document.getElementById('importProject').value.trim()) || data.project || '研判项目';
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('loadingCard').classList.remove('active');
+  render(data, city, project);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function resetForm() {
