@@ -53693,7 +53693,7 @@ function generateReport(city, project) {
     b.innerHTML = '⚠️ <b>核心数据版</b>：已含真实 GDP / 常住人口 / 主导产业；文旅资源、政策支持、区位交通的<b>深度研判待补充</b>。<br>已匹配行政区：<b>' + (cityKey || '未知') + '</b>' + ((cityKey && city !== cityKey && city.includes(cityKey)) ? '（输入「' + city + '」未精确收录，已回退至匹配到的上级行政区「' + cityKey + '」）' : '') + ((!cityKey) ? '（未收录，已使用默认模板）' : '') + '。如需完整版，请补充该行政区专项数据。';
     rep.insertBefore(b, rep.firstChild);
   }
-  render(data, city, project);
+  render(data, city, project, cityKey);
 }
 
 // 核心数据版：仅含真实经济/人口，深度字段诚实标注“待补充”
@@ -53731,7 +53731,7 @@ function liteFill(raw) {
   });
 }
 
-function render(data, city, project) {
+function render(data, city, project, cityKey) {
   try {
   if (!data || !data.kpi || !data.culture) { alert('数据格式不正确：缺少 kpi / culture 等必要字段，请确认粘贴的是完整研判数据 JSON'); return; }
   // 封面
@@ -53808,8 +53808,9 @@ function render(data, city, project) {
   `).join('');
   document.getElementById('policyInsight').textContent = data.policyInsight;
 
-  // 近期城市更新 / 文旅政策动态（全国通用源 + 本地政策）
-  const rpFeed = (data.recentPolicy && data.recentPolicy.length ? data.recentPolicy : []).concat(NATIONAL_RECENT_POLICY);
+  // 近期城市更新 / 文旅政策动态（本地政策源 + 全国通用源）
+  const localPol = (typeof CITY_LOCAL_POLICY !== 'undefined' && cityKey && CITY_LOCAL_POLICY[cityKey]) || [];
+  const rpFeed = localPol.concat(NATIONAL_RECENT_POLICY);
   document.getElementById('recentPolicyList').innerHTML = rpFeed.map(p => `
     <div class="recent-pol-item">
       <div class="rp-meta">
@@ -54040,8 +54041,8 @@ function render(data, city, project) {
   // 棱镜结论
   document.getElementById('lensConclusion').textContent = data.conclusion;
 
-  // 重点项目（文旅 / 城市更新）
-  const projects = data.projects || [];
+  // 重点项目（文旅 / 城市更新）— 来自独立数据表 CITY_PROJECTS
+  const projects = (typeof CITY_PROJECTS !== 'undefined' && cityKey && CITY_PROJECTS[cityKey] && CITY_PROJECTS[cityKey].projects) || [];
   document.getElementById('projectCount').textContent = projects.length;
   document.getElementById('projectList').innerHTML = projects.length ? projects.map(p => `
     <div class="project-card">
