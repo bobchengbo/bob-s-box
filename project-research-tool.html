@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>项目研判报告工具</title>
+<title>山地文旅项目调研报告工具</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -964,7 +964,7 @@
 
 <!-- 头部 -->
 <div class="header">
-  <h1>项目研判报告工具</h1>
+  <h1>山地文旅项目调研报告工具</h1>
   <p>全资产运营服务商 · 商务研判专用</p>
   <span class="header-badge">棱镜 Lens · v2.0</span>
 </div>
@@ -5595,7 +5595,7 @@ function render(data, city, project) {
   try {
   if (!data || !data.kpi || !data.culture) { alert('数据格式不正确：缺少 kpi / culture 等必要字段，请确认粘贴的是完整研判数据 JSON'); return; }
   // 封面
-  document.getElementById('coverTitle').textContent = project + ' 项目研判报告';
+  document.getElementById('coverTitle').textContent = project + ' 山地文旅项目调研报告';
   document.getElementById('coverCity').textContent = '📍 ' + city;
   document.getElementById('coverDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
 
