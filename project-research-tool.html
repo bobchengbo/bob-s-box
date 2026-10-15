@@ -788,6 +788,60 @@
     background: linear-gradient(135deg, #eff6ff, #dbeafe);
     border-left-color: var(--primary-light);
   }
+  .culture-stat-card.is-empty {
+    background: #f8fafc;
+    border-left-color: #cbd5e1;
+    opacity: 0.85;
+  }
+  .culture-stat-card.is-empty .stat-num {
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .culture-stat-card .stat-pending {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 9px;
+    color: #f59e0b;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  /* 文化模块空态 */
+  .culture-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 28px 16px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    color: #64748b;
+  }
+  .culture-empty-state .empty-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+  }
+  .culture-empty-state .empty-desc {
+    font-size: 11px;
+    line-height: 1.7;
+    color: #64748b;
+  }
+  /* 文化GDP 图表空态叠加 */
+  .chart-empty-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(248, 250, 252, 0.92);
+    font-size: 12px;
+    color: #94a3b8;
+    border-radius: 6px;
+    pointer-events: none;
+  }
 
   /* IP矩阵 */
   .ip-matrix-row {
@@ -53892,15 +53946,35 @@ function render(data, city, project, cityKey) {
 
   // ① 量化台账（6项指标卡片）
   const statKeys = ['wenhuaDanwei','feiyi','aji','guodian','minsu','wenhuaBu'];
-  document.getElementById('cultureStatsGrid').innerHTML = statKeys.map(k => `
-    <div class="culture-stat-card${cul.stats[k] !== '—' && k === 'guodian' ? ' highlight' : ''}">
-      <div class="stat-num">${cul.stats[k]}</div>
+  document.getElementById('cultureStatsGrid').innerHTML = statKeys.map(k => {
+    const v = cul.stats[k];
+    const isEmpty = (v === '—' || v == null || v === '');
+    const cls = isEmpty ? 'is-empty' : (k === 'guodian' ? 'highlight' : '');
+    return `
+    <div class="culture-stat-card ${cls}">
+      <div class="stat-num">${isEmpty ? '—' : v}</div>
       <div class="stat-label">${cul.statsLabels[k]}</div>
+      ${isEmpty ? '<span class="stat-pending">待补充</span>' : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
 
-  // ② 文化GDP趋势图
+  // ② 文化GDP趋势图（lite 城全 0 时叠加「暂无数据」空态）
   if (window.cultureGdpChartInst) window.cultureGdpChartInst.destroy();
+  const gdpAllZero = !cul.gdp || cul.gdp.length === 0 || cul.gdp.every(v => !v || v === 0);
+  const gdpCanvasWrap = document.getElementById('cultureGdpChart').parentElement;
+  let gdpEmpty = gdpCanvasWrap.querySelector('.chart-empty-overlay');
+  if (gdpAllZero) {
+    if (!gdpEmpty) {
+      gdpEmpty = document.createElement('div');
+      gdpEmpty.className = 'chart-empty-overlay';
+      gdpEmpty.textContent = '暂无文化GDP数据（待补充）';
+      gdpCanvasWrap.style.position = 'relative';
+      gdpCanvasWrap.appendChild(gdpEmpty);
+    }
+  } else if (gdpEmpty) {
+    gdpEmpty.remove();
+  }
   window.cultureGdpChartInst = new Chart(document.getElementById('cultureGdpChart'), {
     type: 'line',
     data: {
@@ -53950,6 +54024,16 @@ function render(data, city, project, cityKey) {
 
   // ④ 资产IP矩阵（表头 + 数据行）
   const ipScoreColor = s => s >= 80 ? '#059669' : s >= 65 ? '#d97706' : '#dc2626';
+  if (!cul.ipMatrix || cul.ipMatrix.length === 0) {
+    document.getElementById('ipMatrixWrap').innerHTML = `
+      <div class="culture-empty-state">
+        <div class="empty-title">🪶 文化IP潜力矩阵待补充</div>
+        <div class="empty-desc">
+          该行政区 IP 矩阵（客群 / 变现路径 / 收益预期 / 培育周期）尚无实测数据。<br>
+          建议结合地方志、文旅局、A级景区运营方及非遗传承人访谈后逐条录入。
+        </div>
+      </div>`;
+  } else {
   document.getElementById('ipMatrixWrap').innerHTML = `
     <div style="display:grid;grid-template-columns:2fr 1.2fr 1.8fr 1.5fr 0.8fr 0.8fr;background:var(--primary);border-radius:8px 8px 0 0;overflow:hidden;">
       <div style="padding:8px 12px;font-size:11px;color:white;font-weight:500;">IP名称</div>
@@ -53974,8 +54058,20 @@ function render(data, city, project, cityKey) {
     </div>
     `).join('')}
   `;
+  }
 
   // ⑤ 资产卡片（含IP潜力星级）
+  const allPlaceholder = !cul.assets || cul.assets.length === 0 || cul.assets.every(a => a.level === '待补充' || a.level === '待核实');
+  if (allPlaceholder) {
+    document.getElementById('cultureGrid').innerHTML = `
+      <div class="culture-empty-state" style="grid-column:1/-1;">
+        <div class="empty-title">🏛️ 核心文化资产待补充</div>
+        <div class="empty-desc">
+          文保单位 / 国家级非遗 / A级景区 / 历史文化街区 / 工业遗产 / 在地生活方式<br>
+          等核心资产台账尚无实测数据，请结合专项调研补充。
+        </div>
+      </div>`;
+  } else {
   document.getElementById('cultureGrid').innerHTML = cul.assets.map(a => `
     <div class="asset-card" style="border-top:3px solid ${a.color}">
       <span class="asset-level" style="background:${a.color};position:absolute;top:8px;right:8px;font-size:10px;padding:1px 6px;border-radius:4px;color:white;font-weight:600;">${a.level}</span>
@@ -53987,6 +54083,7 @@ function render(data, city, project, cityKey) {
       </div>
     </div>
   `).join('');
+  }
 
   // ⑥ 缺口分析
   document.getElementById('cultureGap').textContent = cul.gap;
