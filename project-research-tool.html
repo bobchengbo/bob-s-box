@@ -7006,6 +7006,10 @@ const CITY_DB = {
     gdp:[651,682,714,754,794], gdpLabels:["2020","2021","2022","2023","2024"],
     pop:21, popTrend:"净流入", industry:[1,1,1], industryLabels:["绿色石化","船舶海工","临港产业"],
     _core:{gdp:794, pop:21, prov:"浙江", trend:"净流入", inds:["绿色石化","船舶海工","临港产业"]} },
+  "长沙县": { _lite:true, cityKey:"长沙县", province:"湖南",
+    gdp:[1858,1949,2040,2153,2266], gdpLabels:["2020","2021","2022","2023","2024"],
+    pop:145, popTrend:"净流入", industry:[1,1,1], industryLabels:["工程机械","汽车及零部件","电子信息"],
+    _core:{gdp:2266, pop:145, prov:"湖南", trend:"净流入", inds:["工程机械","汽车及零部件","电子信息"]}, income:57852 },
 };
 
 // 默认数据（未知城市使用）
@@ -7137,7 +7141,8 @@ function animateLoading(callback) {
 }
 
 function generateReport(city, project) {
-  const cityKey = Object.keys(CITY_DB).find(k => city.includes(k));
+  // 最长优先匹配：县级（如「长沙县」）优先于上级地级市（如「长沙」），避免错配
+  const cityKey = Object.keys(CITY_DB).sort((a,b)=>b.length-a.length).find(k => city.includes(k));
   const raw = cityKey ? CITY_DB[cityKey] : DEFAULT_DATA;
   let data = raw;
   if (raw._lite) data = liteFill(raw);
@@ -7149,7 +7154,7 @@ function generateReport(city, project) {
     const b = document.createElement('div');
     b.id = 'liteBanner';
     b.style.cssText = 'background:#fffbeb;border:1px solid #fcd34d;color:#92400e;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.5;';
-    b.innerHTML = '⚠️ <b>核心数据版</b>：已含真实 GDP / 常住人口 / 主导产业；文旅资源、政策支持、区位交通的<b>深度研判待补充</b>。如需完整版，请补充该城市专项数据。';
+    b.innerHTML = '⚠️ <b>核心数据版</b>：已含真实 GDP / 常住人口 / 主导产业；文旅资源、政策支持、区位交通的<b>深度研判待补充</b>。<br>已匹配行政区：<b>' + (cityKey || '未知') + '</b>' + ((cityKey && city !== cityKey && city.includes(cityKey)) ? '（输入「' + city + '」未精确收录，已回退至匹配到的上级行政区「' + cityKey + '」）' : '') + ((!cityKey) ? '（未收录，已使用默认模板）' : '') + '。如需完整版，请补充该行政区专项数据。';
     rep.insertBefore(b, rep.firstChild);
   }
   render(data, city, project);
