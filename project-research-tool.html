@@ -1165,6 +1165,35 @@
         <strong style="color:#15803d;">⚡ 政策要点提示：</strong>
         <span id="policyInsight">—</span>
       </div>
+
+      <!-- 近期城市更新 / 文旅政策动态 -->
+      <style>
+        .recent-pol-item{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+        .rp-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+        .rp-tag{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;}
+        .rp-urban{background:#fef3c7;color:#b45309;}
+        .rp-tour{background:#dbeafe;color:#1d4ed8;}
+        .rp-level{font-size:11px;color:#64748b;}
+        .rp-date{font-size:11px;color:#94a3b8;margin-left:auto;}
+        .rp-title{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:4px;}
+        .rp-summary{font-size:12px;color:var(--text-light);line-height:1.6;}
+        .rp-source{font-size:11px;color:#94a3b8;margin-top:4px;}
+        .project-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:white;}
+        .pc-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+        .pc-type{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;}
+        .pc-urban{background:#fef3c7;color:#b45309;}
+        .pc-tour{background:#dbeafe;color:#1d4ed8;}
+        .pc-name{font-size:14px;font-weight:600;color:var(--primary);}
+        .pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+        .pc-item{display:flex;flex-direction:column;}
+        .pc-k{font-size:11px;color:#94a3b8;}
+        .pc-v{font-size:12px;color:#334155;font-weight:500;}
+        .pc-note{font-size:11px;color:var(--text-light);margin-top:8px;line-height:1.5;background:#f8fafc;padding:6px 8px;border-radius:6px;}
+        .lite-note{font-size:12px;color:#94a3b8;background:#f8fafc;border:1px dashed var(--border);border-radius:8px;padding:14px;text-align:center;}
+        @media(max-width:640px){.pc-grid{grid-template-columns:1fr;}}
+      </style>
+      <div style="font-size:13px;font-weight:500;color:var(--text-light);margin:18px 0 10px;">近期城市更新 / 文旅政策动态</div>
+      <div id="recentPolicyList" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
     <!-- 三、宏观经济与人口 -->
@@ -1281,9 +1310,15 @@
       </div>
     </div>
 
-    <!-- 六、综合结论与建议 -->
+    <!-- 六、重点项目研判（文旅 / 城市更新） -->
     <div class="card">
-      <div class="card-title"><span class="num">6</span>综合结论与建议</div>
+      <div class="card-title"><span class="num">6</span>重点项目研判（文旅 / 城市更新）<span style="font-size:12px;font-weight:400;color:var(--text-light);margin-left:8px;">共 <b id="projectCount">0</b> 个本地在库项目</span></div>
+      <div id="projectList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
+    </div>
+
+    <!-- 七、综合结论与建议 -->
+    <div class="card">
+      <div class="card-title"><span class="num">7</span>综合结论与建议</div>
       <div class="conclusion-grid">
         <div class="conclusion-item strength">
           <h4>✅ 优势与机会</h4>
@@ -53550,6 +53585,45 @@ let gdpChartInstance = null;
 let industryChartInstance = null;
 let compChartInstance = null;
 
+// ══════════════════════════════════════════════
+// 全国通用：近期城市更新 / 文旅政策源（真实、带日期出处，定期更新）
+// 所有报告的政策页都会展示这份清单；各城市还可在 data.recentPolicy 补本地政策
+// ══════════════════════════════════════════════
+const NATIONAL_RECENT_POLICY = [
+  { date:'2025-05', level:'国家', tag:'城市更新',
+    title:'中办、国办《关于持续推进城市更新行动的意见》',
+    summary:'城市更新纲领性文件，部署8项重点任务（老旧小区、老旧街区/厂区/城中村、完整社区、历史文化保护等），目标到2030年体制机制完善。明确“保护第一、应保尽保”，严禁拆真建假。',
+    source:'新华社 / 住建部' },
+  { date:'2025-06', level:'国家', tag:'城市更新',
+    title:'中央财政支持城市更新行动（2025年第二批20城）',
+    summary:'财政部、住建部公示第二批20城（北京、天津、苏州、长沙、广州、厦门、郑州、济南等），定额补助东部≤8亿、中部≤10亿、西部≤12亿、直辖市≤12亿，总补助超200亿元；2024首批已支持15城。',
+    source:'财政部 / 住建部' },
+  { date:'2025-08', level:'国家', tag:'城市更新',
+    title:'中共中央、国务院《关于推动城市高质量发展的意见》',
+    summary:'明确城市发展从增量扩张转向“存量提质增效为主”，以城市更新为重要抓手；到2030年现代化人民城市建设取得重要进展。',
+    source:'新华社 / 住建部' },
+  { date:'2025-06', level:'国家', tag:'城市更新',
+    title:'2025年中央预算内投资设立“城市更新专项”',
+    summary:'支持城市更新相关公益性基础设施和公共服务设施建设，扩围支持危旧住房、老旧街区（厂区）改造提质。',
+    source:'国家发改委' },
+  { date:'2024-08', level:'国家', tag:'文旅',
+    title:'国务院《关于促进服务消费高质量发展的意见》（国发〔2024〕18号）',
+    summary:'文旅消费列为改善型消费重点：深化“百城百区”文旅消费行动、国家文旅消费示范城市、夜间文旅消费集聚区、乡村旅游提质增效、“音乐+旅游/演出+旅游”等融合业态。',
+    source:'中国政府网' },
+  { date:'2025-01', level:'国家', tag:'文旅',
+    title:'国办《关于进一步培育新增长点繁荣文化和旅游消费的若干措施》（国办发〔2025〕2号）',
+    summary:'18条措施：文旅消费券/满减、银发旅游列车、非遗进商圈进景区、四季村晚、文旅+百业，着力把文化旅游业培育成支柱产业。',
+    source:'中国政府网' },
+  { date:'2024-04', level:'国家', tag:'文旅',
+    title:'文旅部2024年全国文化和旅游消费促进活动',
+    summary:'贯穿2024年4月至2025年2月，主题“文旅惠民乐民 共享美好生活”，联动银联、银行及OTA平台推出惠民补贴与特色场景。',
+    source:'文化和旅游部' },
+  { date:'2025-10', level:'国家', tag:'文旅',
+    title:'商务部等《关于扩大服务消费的若干政策措施》',
+    summary:'多项措施聚焦文旅：探索中小学春秋假释放旅游时间、扩容入境游（免签/支付便利）、支持体育旅游/医疗文旅等新业态。',
+    source:'商务部 / 央广网' },
+];
+
 function runAnalysis() {
   const city = document.getElementById('city').value.trim();
   const project = document.getElementById('project').value.trim();
@@ -53652,7 +53726,7 @@ function liteFill(raw) {
     location: { rail:'待补充', airport:'待补充', highway:'待补充' }, locationInsight: '区位交通深度研判待补充。',
     strengths: ['已录入核心经济与人口数据（2024 GDP ' + lastGdp + ' 亿元 / 常住人口 ' + pop + ' 万人）', '主导产业：' + indTxt],
     risks: ['文旅资源、政策支持、区位交通深度研判待补充'],
-    coop: [],
+    coop: [], projects: [], recentPolicy: [],
     conclusion: '该城市已录入核心经济与人口数据（2024 GDP ' + lastGdp + ' 亿元、常住人口 ' + pop + ' 万人、主导产业 ' + indTxt + '）。文旅资源、政策支持、区位交通的深度研判与 IP 矩阵需结合实地调研与专项数据补充后生成。'
   });
 }
@@ -53733,6 +53807,21 @@ function render(data, city, project) {
     </tr>
   `).join('');
   document.getElementById('policyInsight').textContent = data.policyInsight;
+
+  // 近期城市更新 / 文旅政策动态（全国通用源 + 本地政策）
+  const rpFeed = (data.recentPolicy && data.recentPolicy.length ? data.recentPolicy : []).concat(NATIONAL_RECENT_POLICY);
+  document.getElementById('recentPolicyList').innerHTML = rpFeed.map(p => `
+    <div class="recent-pol-item">
+      <div class="rp-meta">
+        <span class="rp-tag ${p.tag === '城市更新' ? 'rp-urban' : 'rp-tour'}">${p.tag}</span>
+        <span class="rp-level">${p.level}</span>
+        <span class="rp-date">${p.date}</span>
+      </div>
+      <div class="rp-title">${p.title}</div>
+      <div class="rp-summary">${p.summary}</div>
+      <div class="rp-source">来源：${p.source}</div>
+    </div>
+  `).join('');
 
   // 经济指标
   document.getElementById('k-gdp').textContent = data.gdp[data.gdp.length-1] + '亿元';
@@ -53950,6 +54039,25 @@ function render(data, city, project) {
 
   // 棱镜结论
   document.getElementById('lensConclusion').textContent = data.conclusion;
+
+  // 重点项目（文旅 / 城市更新）
+  const projects = data.projects || [];
+  document.getElementById('projectCount').textContent = projects.length;
+  document.getElementById('projectList').innerHTML = projects.length ? projects.map(p => `
+    <div class="project-card">
+      <div class="pc-head">
+        <span class="pc-type ${p.type === '城市更新' ? 'pc-urban' : 'pc-tour'}">${p.type}</span>
+        <span class="pc-name">${p.name}</span>
+      </div>
+      <div class="pc-grid">
+        <div class="pc-item"><div class="pc-k">业主方</div><div class="pc-v">${p.owner || '—'}</div></div>
+        <div class="pc-item"><div class="pc-k">服务方</div><div class="pc-v">${p.service || '—'}</div></div>
+        <div class="pc-item"><div class="pc-k">项目阶段</div><div class="pc-v">${p.stage || '—'}</div></div>
+        <div class="pc-item"><div class="pc-k">投资体量</div><div class="pc-v">${p.invest || '—'}</div></div>
+      </div>
+      ${p.note ? `<div class="pc-note">${p.note}</div>` : ''}
+    </div>
+  `).join('') : '<div class="lite-note">该城市重点项目台账待补充（业主方 / 服务方 / 项目阶段 / 投资体量需结合公开招投标、政府采购与权威媒体报道专项采集）。</div>';
 
   // 显示报告
   document.getElementById('report').classList.add('active');
